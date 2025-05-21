@@ -1,0 +1,59 @@
+---
+const bgImage = "https://cdn.shopify.com/s/files/1/0738/0929/7651/files/Screenshot_2025-05-19_135730.png?v=1747677478";
+
+const bgImageMobile = "https://cdn.shopify.com/s/files/1/0738/0929/7651/files/IMG_0251_upscaled.jpg?v=1743464049"
+---
+<section id="hero" class="h-[65vh] md:h-screen relative">
+    <div class="-z-10 h-full w-full absolute">
+        <img src={bgImage} alt="Hero image" class="hidden md:block h-full w-full object-cover" />
+        <img src={bgImageMobile} alt="Hero image" class="md:hidden h-full w-full object-cover" />
+    </div>
+    <div class="flex justify-end flex-col h-full px-4 md:px-8 font-primary">
+        <div class="text-white">
+            <h2 class="uppercase text-xl md:text-2xl">Welcome</h2>
+            <h1 class="font-bold text-2xl md:text-4xl uppercase">Universal Citizens of the World</h1>
+            <p class="text-xl md:text-2xl">Astragarde is a revolution in daily garments redefining the ordinary.</p>
+        </div>
+        <div class="my-4">
+            <button id="shopNowButton" class="cursor-pointer bg-zinc-800 text-white px-8 py-2 rounded-sm md:text-xl uppercase font-bold relative overflow-hidden">Shop Now</button>
+        </div>
+    </div>
+
+</section>
+
+<style>
+@keyframes shine {
+    0% {
+        left: 100%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        left: -200%;
+        opacity: 0;
+    }
+}
+
+#shopNowButton:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    transform: skewX(-20deg);
+    background-image: linear-gradient(to right, transparent, rgba(255,255,255,.15), transparent);
+    opacity: 0;
+}
+
+#shopNowButton:hover:after {
+    animation: shine 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+</style>
+

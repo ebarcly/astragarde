@@ -1,6 +1,10 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
 
 @theme {
+  /* To change later */
+  --font-primary: 'Syne', sans-serif; 
+
   /* Animation */
   --animate-shake: shake 0.5s infinite;
 
