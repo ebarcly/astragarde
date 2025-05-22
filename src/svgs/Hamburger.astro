@@ -1,0 +1,29 @@
+---
+export interface Props {
+  color?: "black" | "white";
+}
+
+const { color = "black" } = Astro.props;
+const colorClass = color === "white" ? "text-white" : "text-black";
+---
+
+<svg
+  class={`h-8 w-8 ${colorClass}`}
+  aria-hidden="true"
+  focusable="false"
+  role="presentation"
+  viewBox="0 0 64 64"
+  xmlns="http://www.w3.org/2000/svg"
+  width="32"
+  height="32"
+>
+  <title>icon-hamburger</title>
+
+  <!-- Hamburger lines -->
+  <path
+    d="M7 15h51M7 32h43M7 49h51"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linecap="round"></path>
+</svg>

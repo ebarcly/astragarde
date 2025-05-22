@@ -1,44 +1,47 @@
 ---
 import Logo from "./Logo.astro";
-import CartIcon from "./CartIcon.svelte";
+import LogoWhite from "./LogoWhite.astro";
+import Cart from "$/svgs/Cart.astro";
+import SearchIcon from "$/svgs/SearchIcon.astro";
+import Hamburger from "$/svgs/Hamburger.astro";
 ---
 
-<header id="mainHeader" class="absolute top-0 z-40 w-full transition-all duration-300">
-<nav class="w-full flex justify-between px-4 py-4">
-  <div>"icon"</div>
-  <div>"logo"</div>
-  <!-- you can put multiple icons here as per the design, replicate in the scrolledheader -->
-  <div>
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-</nav>
+<header
+  id="mainHeader"
+  class="absolute top-0 z-40 w-full transition-all duration-300"
+>
+  <nav class="flex w-full justify-between p-8">
+    <button><Hamburger color="white" /></button>
+    <div class="h-8"><LogoWhite /></div>
+    <div class="flex gap-4">
+      <a><SearchIcon color="white" /></a>
+      <span><Cart color="white" /></span>
+    </div>
+  </nav>
 </header>
 
-<header id="scrolledHeader" class="fixed top-0 z-40 w-full transition-all duration-300 bg-white translate-y-[-100%]">
-<nav class="w-full flex justify-between px-4 py-4">
-  <div>"icon"</div>
-  <div>"logo"</div>
-  <div>
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-</nav>
+<header
+  id="scrolledHeader"
+  class="fixed top-0 z-40 w-full translate-y-[-100%] bg-white transition-all duration-300"
+>
+  <nav class="flex w-full justify-between p-8">
+    <button><Hamburger /></button>
+    <div class="h-8"><Logo /></div>
+    <div class="flex gap-4">
+      <a><SearchIcon /></a>
+      <span><Cart /></span>
+    </div>
+  </nav>
 </header>
 
 <script>
-  const scrolledHeader = document.getElementById('scrolledHeader');
-  
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 200) 
-    {
-      scrolledHeader?.classList.remove( 'translate-y-[-100%]');
-    } 
-      
-    else {
-      scrolledHeader?.classList.add( 'translate-y-[-100%]');    
+  const scrolledHeader = document.getElementById("scrolledHeader");
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 200) {
+      scrolledHeader?.classList.remove("translate-y-[-100%]");
+    } else {
+      scrolledHeader?.classList.add("translate-y-[-100%]");
     }
   });
 </script>
