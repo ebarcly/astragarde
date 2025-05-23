@@ -1,4 +1,8 @@
 ---
+import Products from './Products.astro';
+
+import mockupProducts from '$/utils/mockup.ts';
+
 // Props interface for CMS integration
 export interface Props {
   title?: string;
@@ -24,7 +28,7 @@ const {
 ---
 
 <section class="section-padding-x! data-countdown-section py-20 sm:px-20">
-  <div class="mx-auto">
+  <div id="countdownSection" class="mx-auto">
     <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-3">
       <!-- Left Section - Title and Link -->
       <div class="px-10 lg:col-span-1">
@@ -114,6 +118,10 @@ const {
         </a>
       </div>
     </div>
+  </div>
+
+  <div id="seasonProducts" >
+    <Products products={mockupProducts} />
   </div>
 </section>
 
