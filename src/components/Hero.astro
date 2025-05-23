@@ -3,16 +3,16 @@ const bgImage = "https://cdn.shopify.com/s/files/1/0738/0929/7651/files/Screensh
 
 const bgImageMobile = "https://cdn.shopify.com/s/files/1/0738/0929/7651/files/IMG_0251_upscaled.jpg?v=1743464049"
 ---
-<section id="hero" class="h-[65vh] md:h-screen relative">
+<section id="hero" class="h-[65vh] md:h-screen relative ">
     <div class="-z-10 h-full w-full absolute">
-        <img src={bgImage} alt="Hero image" class="hidden md:block h-full w-full object-cover" />
-        <img src={bgImageMobile} alt="Hero image" class="md:hidden h-full w-full object-cover" />
+        <img src={bgImage} alt="Hero background" class="hidden md:block h-full w-full object-cover" />
+        <img src={bgImageMobile} alt="Hero background" class="md:hidden h-full w-full object-cover" />
     </div>
-    <div class="flex justify-end flex-col h-full px-4 md:px-8 font-primary">
+    <div class="flex justify-end flex-col h-full  font-primary px-4 md:px-8 xl:px-40 2xl:px-60 xl:py-10">
         <div class="text-white">
-            <h2 class="uppercase text-xl md:text-2xl">Welcome</h2>
-            <h1 class="font-bold text-2xl md:text-4xl uppercase">Universal Citizens of the World</h1>
-            <p class="text-xl md:text-2xl">Astragarde is a revolution in daily garments redefining the ordinary.</p>
+            <h2 class="uppercase text-xl md:text-2xl xl:text-3xl">Welcome</h2>
+            <h1 class="font-bold text-2xl md:text-4xl xl:text-5xl uppercase">Universal Citizens of the World</h1>
+            <p class="text-xl md:text-2xl xl:text-3xl">Astragarde is a revolution in daily garments redefining the ordinary.</p>
         </div>
         <div class="my-4">
             <button id="shopNowButton" class="cursor-pointer bg-zinc-800 text-white px-8 py-2 rounded-sm md:text-xl uppercase font-bold relative overflow-hidden">Shop Now</button>

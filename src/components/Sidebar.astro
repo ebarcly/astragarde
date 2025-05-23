@@ -1,0 +1,78 @@
+---
+const navLinks = [
+  { href: "/", text: "Home" },
+  { href: "/catalog", text: "Catalog" },
+  { href: "/about", text: "About" },
+  { href: "/contact", text: "Contact" },
+];
+---
+
+<div id="overlay" class="fixed inset-0 z-60 hidden bg-white/30"></div>
+
+<div
+  id="sidebar"
+  class="fixed z-70 flex h-full w-[350px] -translate-x-full flex-col bg-white p-4 transition-all duration-300"
+>
+  <div class="flex w-full justify-end">
+    <button
+      id="closeSidebar"
+      class="cursor-pointer p-2 text-black hover:text-zinc-900"
+    >
+      <svg
+        class="h-6 w-6"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1"
+          d="M6 18 18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  <nav class="mt-6 space-y-1 overflow-y-auto px-2">
+    <ul class="font-primary space-y-4 font-bold uppercase">
+      {
+        navLinks.map((link) => (
+          <li>
+            <a href={link.href} class="text-gray-900 hover:text-gray-600">
+              {link.text}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
+
+<script>
+  const closeSidebar = document.getElementById("closeSidebar");
+  const openSidebar = document.getElementById("openSidebar");
+  const openSidebarScrolled = document.getElementById("openSidebarScrolled");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+
+  function closeSidebarMenu() {
+    sidebar?.classList.remove("translate-x-0");
+    sidebar?.classList.add("-translate-x-full");
+    overlay?.classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+  }
+
+  function openSidebarMenu() {
+    sidebar?.classList.remove("-translate-x-full");
+    sidebar?.classList.add("translate-x-0");
+    overlay?.classList.remove("hidden");
+    document.body.classList.add("overflow-hidden");
+  }
+
+  closeSidebar?.addEventListener("click", closeSidebarMenu);
+  openSidebar?.addEventListener("click", openSidebarMenu);
+  openSidebarScrolled?.addEventListener("click", openSidebarMenu);
+  overlay?.addEventListener("click", closeSidebarMenu);
+</script>
