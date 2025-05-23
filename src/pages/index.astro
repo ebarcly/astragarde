@@ -2,6 +2,7 @@
 import { getProducts } from "./../utils/shopify";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Products from "../components/Products.astro";
+import OfferCountdown from "../components/OfferCountdown.astro";
 import { setCache } from "../utils/cache";
 import Hero from "../components/Hero.astro";
 
@@ -15,5 +16,6 @@ setCache.short(Astro);
 
 <BaseLayout title={title}>
   <Hero />
-  <Products products={products} />
+  <!-- <Products products={products} /> -->
+   <OfferCountdown />
 </BaseLayout>

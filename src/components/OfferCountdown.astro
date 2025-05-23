@@ -1,0 +1,223 @@
+---
+// Props interface for CMS integration
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  linkText?: string;
+  linkUrl?: string;
+  buttonText?: string;
+  buttonUrl?: string;
+  endDate?: string; // ISO string format
+  backgroundColor?: string;
+}
+
+// Default values (can be overridden by CMS)
+const {
+  title = "SUMMER DROP",
+  subtitle = "Official Drop",
+  linkText = "Official Drop",
+  linkUrl = "#",
+  buttonText = "SHOP COLLECTION",
+  buttonUrl = "#",
+  endDate = new Date("2025-05-27T00:00:00Z").toISOString(), // The date we'll finish this site
+} = Astro.props;
+---
+
+<section class="section-padding-x! data-countdown-section py-20 sm:px-20">
+  <div class="mx-auto">
+    <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-3">
+      <!-- Left Section - Title and Link -->
+      <div class="px-10 lg:col-span-1">
+        <h1 class="mb-4 text-5xl font-black text-black">
+          {title}
+        </h1>
+        <a
+          href={linkUrl}
+          class="inline-flex items-center font-medium text-black hover:underline"
+        >
+          {linkText}
+          <svg
+            class="ml-2 h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Center Section - Countdown Timer -->
+      <div class="lg:col-span-1">
+        <div class="flex w-full justify-center text-center gap-4">
+          <!-- Days -->
+          <div class="flex flex-col items-center border-r border-black px-2">
+            <span
+              id="countdown-days"
+              class="text-4xl font-black text-black lg:text-5xl">0</span
+            >
+            <span
+              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
+              >DAYS</span
+            >
+          </div>
+
+          <!-- Hours -->
+          <div class="flex flex-col items-center border-r border-black pr-4">
+            <span
+              id="countdown-hours"
+              class="text-4xl font-black text-black lg:text-5xl">0</span
+            >
+            <span
+              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
+              >HOURS</span
+            >
+          </div>
+
+          <!-- Minutes -->
+          <div class="flex flex-col items-center border-r border-black pr-4">
+            <span
+              id="countdown-minutes"
+              class="text-4xl font-black text-black lg:text-5xl">0</span
+            >
+            <span
+              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
+              >MINUTES</span
+            >
+          </div>
+
+          <!-- Seconds -->
+          <div class="flex flex-col items-center">
+            <span
+              id="countdown-seconds"
+              class="text-4xl font-black text-black lg:text-5xl">0</span
+            >
+            <span
+              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
+              >SECONDS</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Section - Shop Button -->
+      <div class="flex justify-center lg:col-span-1 lg:justify-end">
+        <a
+          href={buttonUrl}
+          class="inline-block bg-black px-8 py-3 text-center font-medium tracking-wider text-white uppercase transition-colors duration-200 hover:bg-gray-800"
+        >
+          {buttonText}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ endDate }}>
+  class CountdownTimer {
+    constructor(targetDate) {
+      this.targetDate = new Date(targetDate);
+      this.elements = {
+        days: document.getElementById("countdown-days"),
+        hours: document.getElementById("countdown-hours"),
+        minutes: document.getElementById("countdown-minutes"),
+        seconds: document.getElementById("countdown-seconds"),
+      };
+      this.timer = null;
+      this.init();
+    }
+
+    init() {
+      // Update immediately
+      this.updateDisplay();
+      // Then update every second
+      this.timer = setInterval(() => this.updateDisplay(), 1000);
+    }
+
+    updateDisplay() {
+      const now = new Date().getTime();
+      const distance = this.targetDate.getTime() - now;
+
+      if (distance < 0) {
+        this.handleCountdownEnd();
+        return;
+      }
+
+      const timeUnits = this.calculateTimeUnits(distance);
+      this.renderTimeUnits(timeUnits);
+    }
+
+    calculateTimeUnits(distance) {
+      return {
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        ),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000),
+      };
+    }
+
+    renderTimeUnits(timeUnits) {
+      Object.keys(timeUnits).forEach((unit) => {
+        if (this.elements[unit]) {
+          this.elements[unit].textContent = timeUnits[unit]
+            .toString()
+            .padStart(2, "0");
+        }
+      });
+    }
+
+    handleCountdownEnd() {
+      if (this.timer) {
+        clearInterval(this.timer);
+      }
+
+      // Display zeros
+      Object.values(this.elements).forEach((element) => {
+        if (element) element.textContent = "00";
+      });
+
+      // Dispatch custom event for countdown end
+      document.dispatchEvent(
+        new CustomEvent("countdownEnded", {
+          detail: {
+            section: document.querySelector("[data-countdown-section]"),
+          },
+        })
+      );
+    }
+
+    destroy() {
+      if (this.timer) {
+        clearInterval(this.timer);
+      }
+    }
+  }
+
+  // Initialize countdown when DOM is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    new CountdownTimer(endDate);
+  });
+
+  // Optional: Listen for countdown end event
+  document.addEventListener("countdownEnded", (event) => {
+    console.log("Countdown has ended!");
+    // You can add custom logic here, like hiding the section or showing a message
+  });
+</script>
+
+<style>
+  /* Ensure consistent spacing for countdown numbers */
+  #countdown-days,
+  #countdown-hours,
+  #countdown-minutes,
+  #countdown-seconds {
+    min-width: 2ch;
+    display: inline-block;
+  }
+</style>
