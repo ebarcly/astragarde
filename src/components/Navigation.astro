@@ -35,7 +35,7 @@ const getMainHeaderClasses = () => {
 };
 
 const getScrolledHeaderClasses = () => {
-  const baseClasses = "fixed top-0 z-40 w-full transition-all duration-300 section-padding-x bg-mainbg";
+  const baseClasses = "hidden fixed top-0 z-40 w-full transition-all duration-300 section-padding-x bg-mainbg";
   const hiddenClass = enableScrollAnimation ? "translate-y-[-100%]" : "";
   return `${baseClasses} ${hiddenClass}`;
 };
@@ -99,6 +99,11 @@ const useWhiteIcons = variant === 'absolute';
     const scrolledHeader = document.getElementById(scrolledHeaderId);
 
     const handleScroll = () => {
+      if (window.scrollY > 20) {
+        scrolledHeader?.classList.remove("hidden")
+      } else {
+        scrolledHeader.classList.add("hidden")
+      }
       if (window.scrollY > 200) {
         scrolledHeader?.classList.remove("translate-y-[-100%]");
       } else {

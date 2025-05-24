@@ -2,12 +2,44 @@
 const { products } = Astro.props;
 ---
 
-<div class="h-screen">
-    Hola
-</div>
-<div class="h-screen">
-    Hola
-</div>
-<div class="h-screen">
-    Hola
+<div class="w-screen flex flex-col lg:flex-row lg:h-[75vh]">
+    <!-- First Product -->
+    <div class="relative flex-1">
+        <img 
+            src={products[0]?.img} 
+            alt={products[0]?.title}
+            class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <h2 class="text-white text-lg lg:text-xl font-light uppercase tracking-[0.2em] mb-4">
+                Limited Time
+            </h2>
+            <a 
+                href={products[0]?.linkUrl} 
+                class="bg-black text-white px-6 py-2 text-sm font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors duration-300"
+            >
+                Shop This
+            </a>
+        </div>
+    </div>
+    
+    <!-- Second Product -->
+    <div class="relative flex-1">
+        <img 
+            src={products[1]?.img} 
+            alt={products[1]?.title}
+            class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <h2 class="text-white text-lg lg:text-xl font-light uppercase tracking-[0.2em] mb-4">
+                Limited Time
+            </h2>
+            <a 
+                href={products[1]?.linkUrl} 
+                class="bg-black text-white px-6 py-2 text-sm font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors duration-300"
+            >
+                Shop This
+            </a>
+        </div>
+    </div>
 </div>

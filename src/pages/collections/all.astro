@@ -2,8 +2,13 @@
 import BaseLayout from "$/layouts/BaseLayout.astro";
 import LimitedTime from "$/components/LimitedTime.astro";
 import { setCache } from "$/utils/cache";
+import { getProducts } from "$/utils/shopify";
+import Products from "$/components/Products.astro";
 
-const title = "Catalog"
+const title = "Catalog";
+const headers = Astro.request.headers;
+const ip = headers.get("x-vercel-forwarded-for") || Astro.clientAddress;
+const products = await getProducts({ buyerIP: ip });
 
 setCache.short(Astro);
 
@@ -12,18 +17,22 @@ const limitedTime = [
   {
     title: "Shirt A",
     linkUrl: "/collections/shirt-a",
-    img: "https://placehold.co/600x400?text=Shirt+A",
+    img: "https://placehold.co/400x500?text=Shirt+A",
   },
   {
     title: "Shirt B",
     linkUrl: "/collections/shirt-b",
-    img: "https://placehold.co/600x400?text=Shirt+B",
+    img: "https://placehold.co/400x500?text=Shirt+B",
   },
 ];
 ---
 
 <section>
-  <BaseLayout title={title} navigation={{variant: "relative", enableScrollAnimation: true}}>
+  <BaseLayout
+    title={title}
+    navigation={{ variant: "relative", enableScrollAnimation: true }}
+  >
     <LimitedTime products={limitedTime} />
+    <Products products={products} />
   </BaseLayout>
 </section>

@@ -1,5 +1,5 @@
 ---
-import Header from "../components/Header.astro";
+import Navigation from "../components/Navigation.astro";
 import Footer from "../components/Footer.astro";
 import Sidebar from "../components/Sidebar.astro";
 import CartDrawer from "../components/CartDrawer.svelte";
@@ -40,7 +40,7 @@ const { title, description = defaultDesc, navigation } = Astro.props as Props;
     <CartDrawer client:idle /> -->
     <header>
       <Sidebar navigationId={navigation?.id}/>
-      <Header variant={navigation?.variant} enableScrollAnimation={navigation?.enableScrollAnimation} id={navigation?.id}/>
+      <Navigation variant={navigation?.variant} enableScrollAnimation={navigation?.enableScrollAnimation} id={navigation?.id}/>
     </header>
     <main>
       <slot />
