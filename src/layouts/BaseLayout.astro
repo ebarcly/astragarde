@@ -36,8 +36,8 @@ const { title, description = defaultDesc, navigation } = Astro.props as Props;
     </style>
   </head>
   <body class="bg-mainbg">
-    <!-- <AnnouncementBar />
-    <CartDrawer client:idle /> -->
+    <!-- <AnnouncementBar /> -->
+    <CartDrawer client:idle /> 
     <header>
       <Sidebar navigationId={navigation?.id}/>
       <Navigation variant={navigation?.variant} enableScrollAnimation={navigation?.enableScrollAnimation} id={navigation?.id}/>

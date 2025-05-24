@@ -45,15 +45,15 @@
 
 {#if $isCartDrawerOpen}
   <div
-    class="relative z-50"
+    class="relative z-70"
     aria-labelledby="slide-over-title"
     role="dialog"
     aria-modal="true"
   >
     <div
-      in:fade={{ duration: 500 }}
-      out:fade={{ duration: 500 }}
-      class="fixed inset-0 bg-slate-400/50 backdrop-blur-sm transition-opacity"
+      in:fade={{ duration: 200 }}
+      out:fade={{ duration: 200 }}
+      class="fixed inset-0 bg-white/30 transition-opacity"
 ></div>
 
     <div class="fixed inset-0 overflow-hidden">

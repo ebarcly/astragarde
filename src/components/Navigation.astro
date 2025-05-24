@@ -1,7 +1,7 @@
 ---
 import Logo from "./Logo.astro";
 import LogoWhite from "$/components/LogoWhite.astro";
-import Cart from "$/svgs/Cart.astro";
+import CartIcon from "$/components/CartIcon.svelte";
 import SearchIcon from "$/svgs/SearchIcon.astro";
 import Hamburger from "$/svgs/Hamburger.astro";
 
@@ -64,7 +64,7 @@ const useWhiteIcons = variant === 'absolute';
 
     <div class="flex justify-end gap-4">
       <a><SearchIcon color={useWhiteIcons ? "white" : undefined} /></a>
-      <span><Cart color={useWhiteIcons ? "white" : undefined} /></span>
+      <CartIcon color={useWhiteIcons ? "white" : "black"} client:load />
     </div>
   </nav>
 </div>
@@ -88,7 +88,7 @@ const useWhiteIcons = variant === 'absolute';
 
       <div class="flex justify-end gap-4">
         <a><SearchIcon /></a>
-        <span><Cart /></span>
+        <CartIcon color="black" client:load />
       </div>
     </nav>
   </div>
