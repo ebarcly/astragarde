@@ -32,7 +32,7 @@ const {
     <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-3">
       <!-- Left Section - Title and Link -->
       <div class="px-10 lg:col-span-1">
-        <h1 class="mb-4 text-5xl font-black text-black">
+        <h1 class="mb-4 text-5xl font-bold text-black">
           {title}
         </h1>
         <a
@@ -59,10 +59,10 @@ const {
       <div class="lg:col-span-1">
         <div class="flex w-full justify-center text-center gap-4">
           <!-- Days -->
-          <div class="flex flex-col items-center border-r border-black px-2">
+          <div class="flex flex-col items-center border-r border-black pr-4">
             <span
               id="countdown-days"
-              class="text-4xl font-black text-black lg:text-5xl">0</span
+              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
             >
             <span
               class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
@@ -74,7 +74,7 @@ const {
           <div class="flex flex-col items-center border-r border-black pr-4">
             <span
               id="countdown-hours"
-              class="text-4xl font-black text-black lg:text-5xl">0</span
+              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
             >
             <span
               class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
@@ -86,7 +86,7 @@ const {
           <div class="flex flex-col items-center border-r border-black pr-4">
             <span
               id="countdown-minutes"
-              class="text-4xl font-black text-black lg:text-5xl">0</span
+              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
             >
             <span
               class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
@@ -98,7 +98,7 @@ const {
           <div class="flex flex-col items-center">
             <span
               id="countdown-seconds"
-              class="text-4xl font-black text-black lg:text-5xl">0</span
+              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
             >
             <span
               class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
@@ -112,7 +112,7 @@ const {
       <div class="flex justify-center lg:col-span-1 lg:justify-end">
         <a
           href={buttonUrl}
-          class="inline-block bg-black px-8 py-3 text-center font-medium tracking-wider text-white uppercase transition-colors duration-200 hover:bg-gray-800"
+          class="button"
         >
           {buttonText}
         </a>
