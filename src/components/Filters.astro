@@ -1,0 +1,181 @@
+---
+// FilterComponent.astro
+---
+<div class="p-6 rounded-lg w-sm">
+  <!-- Active Filter Tag -->
+  <div id="activeFilterTag" class="mb-4 hidden">
+    <div class="bg-green-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium">
+      <span>IN STOCK</span>
+      <button 
+        class="ml-2 text-white hover:text-gray-200"
+        onclick="console.log('Remove filter clicked')"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <!-- Availability Filter -->
+  <div class="mb-8">
+    <button 
+      class="flex items-center justify-between text-left mb-4 focus:outline-none"
+      onclick="console.log('Availability filter toggled')"
+    >
+      <h3 class="text-sm font-medium tracking-wider uppercase text-gray-900">
+        Availability
+      </h3>
+      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </button>
+    
+    <div class="space-y-3">
+      <button 
+        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded"
+        onclick="console.log('In stock filter clicked')"
+        id="inStockButton"
+      >
+        <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">
+          <div class="w-3 h-3 bg-black hidden" id="inStockCheck"></div>
+        </div>
+        <span class="text-gray-900" id="inStockText">In stock (4)</span>
+      </button>
+      
+      <button 
+        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded"
+        onclick="console.log('Out of stock filter clicked')"
+        id="outOfStockButton"
+      >
+        <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">
+          <div class="w-3 h-3 bg-black hidden" id="outOfStockCheck"></div>
+        </div>
+        <span class="text-gray-900" id="outOfStockText">Out of stock (3)</span>
+      </button>
+    </div>
+  </div>
+  <!-- Price Filter -->
+  <div>
+    <button 
+      class="flex items-center justify-between text-left mb-4 focus:outline-none"
+      onclick="console.log('Price filter toggled')"
+    >
+      <h3 class="text-sm font-medium tracking-wider uppercase text-gray-900">
+        Price
+      </h3>
+      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </button>
+    
+    <div class="space-y-4">
+      <!-- Price Range Display -->
+      <div class="flex justify-between text-sm text-gray-900">
+        <span>$0.00</span>
+        <span>$199.00</span>
+      </div>
+      
+      <!-- Price Range Slider -->
+      <div class="relative">
+        <div class="h-2 bg-gray-200 rounded-full">
+          <div class="h-2 bg-gray-800 rounded-full relative">
+            <!-- Left Handle -->
+            <div 
+              class="absolute -top-1 -left-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer"
+              onclick="console.log('Left price handle clicked')"
+            ></div>
+            <!-- Right Handle -->
+            <div 
+              class="absolute -top-1 -right-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer"
+              onclick="console.log('Right price handle clicked')"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Mock console logs for component interactions
+  console.log('Filter component loaded');
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Filter component ready for customization');
+    
+    const activeFilterTag = document.getElementById('activeFilterTag');
+    const inStockButton = document.getElementById('inStockButton');
+    const outOfStockButton = document.getElementById('outOfStockButton');
+    const inStockCheck = document.getElementById('inStockCheck');
+    const outOfStockCheck = document.getElementById('outOfStockCheck');
+    const inStockText = document.getElementById('inStockText');
+    const outOfStockText = document.getElementById('outOfStockText');
+    
+    // In stock button click
+    inStockButton.addEventListener('click', function() {
+      console.log('In stock filter clicked');
+      
+      // Toggle the black square
+      inStockCheck.classList.toggle('hidden');
+      
+      // Toggle bold font
+      if (!inStockCheck.classList.contains('hidden')) {
+        inStockText.classList.add('font-bold');
+      } else {
+        inStockText.classList.remove('font-bold');
+      }
+      
+      // Show/hide the active filter tag
+      if (!inStockCheck.classList.contains('hidden')) {
+        // Clear other selections
+        outOfStockCheck.classList.add('hidden');
+        outOfStockText.classList.remove('font-bold');
+        
+        activeFilterTag.classList.remove('hidden');
+        activeFilterTag.querySelector('span').textContent = 'IN STOCK';
+      } else {
+        activeFilterTag.classList.add('hidden');
+      }
+    });
+    
+    // Out of stock button click
+    outOfStockButton.addEventListener('click', function() {
+      console.log('Out of stock filter clicked');
+      
+      // Toggle the black square
+      outOfStockCheck.classList.toggle('hidden');
+      
+      // Toggle bold font
+      if (!outOfStockCheck.classList.contains('hidden')) {
+        outOfStockText.classList.add('font-bold');
+      } else {
+        outOfStockText.classList.remove('font-bold');
+      }
+      
+      // Show/hide the active filter tag
+      if (!outOfStockCheck.classList.contains('hidden')) {
+        // Clear other selections
+        inStockCheck.classList.add('hidden');
+        inStockText.classList.remove('font-bold');
+        
+        activeFilterTag.classList.remove('hidden');
+        activeFilterTag.querySelector('span').textContent = 'OUT OF STOCK';
+      } else {
+        activeFilterTag.classList.add('hidden');
+      }
+    });
+    
+    // Remove filter tag click
+    activeFilterTag.querySelector('button').addEventListener('click', function() {
+      console.log('Remove filter clicked');
+      
+      // Hide the tag
+      activeFilterTag.classList.add('hidden');
+      
+      // Clear all selections and bold text
+      inStockCheck.classList.add('hidden');
+      outOfStockCheck.classList.add('hidden');
+      inStockText.classList.remove('font-bold');
+      outOfStockText.classList.remove('font-bold');
+    });
+  });
+</script>

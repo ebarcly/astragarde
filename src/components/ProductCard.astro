@@ -9,15 +9,56 @@ export interface Props {
   product: z.infer<typeof ProductResult>;
 }
 const { product } = Astro.props as Props;
+
+// Helper functions
+const isOnSale = product?.variants.nodes[0].compareAtPrice && 
+  parseFloat(product.variants.nodes[0].compareAtPrice.amount) > parseFloat(product.variants.nodes[0].price.amount);
+
+const isSoldOut = !product?.variants.nodes.some(variant => variant.availableForSale);
+
+// Get unique colors from variants (assuming color is in the option values)
+const getColorVariants = () => {
+  if (!product?.variants.nodes) return [];
+  
+  const colors = new Set();
+  product.variants.nodes.forEach(variant => {
+    variant.selectedOptions?.forEach(option => {
+      if (option.name.toLowerCase() === 'color') {
+        colors.add(option.value);
+      }
+    });
+  });
+  
+  return Array.from(colors);
+};
+
+const colorVariants = getColorVariants();
+
+// Color mapping for swatches
+const getColorClass = (colorName: string) => {
+  const colorMap: { [key: string]: string } = {
+    'green': 'bg-green-500',
+    'yellow': 'bg-yellow-400',
+    'red': 'bg-red-500',
+    'blue': 'bg-blue-500',
+    'black': 'bg-black',
+    'white': 'bg-white border-gray-300',
+    'gray': 'bg-gray-400',
+    'grey': 'bg-gray-400',
+  };
+  
+  const lowerColor = colorName.toLowerCase();
+  return colorMap[lowerColor] || 'bg-gray-300';
+};
 ---
 
 <a
   href={`/products/${product?.handle}`}
-  class="group overflow-hidden"
+  class="group overflow-hidden block"
 >
-  <div class="relative">
+  <div class="relative w-44 h-64 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-68 lg:h-96">
     <ShopifyImage
-      classList=""
+      classList="h-full w-full object-cover object-center"
       loading="eager"
       image={product?.featuredImage}
       sizes={`
@@ -30,11 +71,49 @@ const { product } = Astro.props as Props;
     `}
     />
     
+    <!-- Sale/Sold Out Badge -->
+    {isOnSale && !isSoldOut && (
+      <div class="absolute top-2 left-2 bg-black text-white px-2 py-1 text-xs font-medium">
+        Sale
+      </div>
+    )}
+    
+    {isSoldOut && (
+      <div class="absolute top-2 left-2 bg-gray-500 text-white px-2 py-1 text-xs font-medium">
+        Sold Out
+      </div>
+    )}
   </div>
+  
   <div class="flex flex-col justify-between py-2 text-zinc-700">
-    <h3 class="font-primary font-bold" >{product?.title}</h3>
-    <p class="font-primary">
-      <Money price={product?.variants.nodes[0].price} />
-    </p>
+    <h3 class="font-primary font-bold mb-1">{product?.title}</h3>
+    
+    <!-- Price Section -->
+    <div class="font-primary mb-2">
+      {isOnSale ? (
+        <div class="flex items-center gap-2">
+          <span class="line-through text-gray-500 text-sm">
+            <Money price={product?.variants.nodes[0].compareAtPrice} />
+          </span>
+          <span class="text-black">
+            <Money price={product?.variants.nodes[0].price} />
+          </span>
+        </div>
+      ) : (
+        <Money price={product?.variants.nodes[0].price} />
+      )}
+    </div>
+    
+    <!-- Color Swatches -->
+    {colorVariants.length > 0 && (
+      <div class="flex gap-1">
+        {colorVariants.map((color) => (
+          <div 
+            class={`w-4 h-4 rounded-full border ${getColorClass(color as string)}`}
+            title={color as string}
+          />
+        ))}
+      </div>
+    )}
   </div>
 </a>

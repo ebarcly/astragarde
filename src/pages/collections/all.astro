@@ -4,6 +4,7 @@ import LimitedTime from "$/components/LimitedTime.astro";
 import { setCache } from "$/utils/cache";
 import { getProducts } from "$/utils/shopify";
 import Products from "$/components/Products.astro";
+import Filters from "$/components/Filters.astro";
 
 const title = "Catalog";
 const headers = Astro.request.headers;
@@ -33,6 +34,9 @@ const limitedTime = [
     navigation={{ variant: "relative", enableScrollAnimation: true }}
   >
     <LimitedTime products={limitedTime} />
-    <Products products={products} />
+    <div class="flex section-padding-x">
+      <Filters />
+      <Products products={products} />
+    </div>
   </BaseLayout>
 </section>
