@@ -1,0 +1,112 @@
+---
+const aboutData = {
+  header: {
+    title: "About Astragarde",
+    subtitle: "Crafting exceptional experiences through timeless design and uncompromising quality."
+  },
+  image: {
+    src: "https://placehold.co/600x750/f8f9fa/6c757d?text=Astragarde+Studio",
+    alt: "Astragarde studio workspace"
+  },
+  philosophy: {
+    title: "Our Philosophy",
+    paragraphs: [
+      "At Astragarde, we believe in the power of simplicity. Every piece we create is a testament to our commitment to quality craftsmanship and thoughtful design. We strip away the unnecessary to reveal what truly matters.",
+      "Our approach is rooted in the understanding that true luxury lies not in ostentation, but in the perfect balance of form, function, and feeling."
+    ]
+  },
+  process: {
+    title: "Our Process",
+    description: "Each product begins with an idea—a vision of how it should feel, function, and integrate into daily life. We iterate, refine, and perfect until every detail serves its purpose with quiet confidence."
+  },
+  stats: [
+    { value: "2019", label: "Founded" },
+    { value: "50K+", label: "Customers" },
+    { value: "25", label: "Countries" },
+    { value: "100%", label: "Sustainable" }
+  ],
+  values: [
+    {
+      title: "Quality First",
+      description: "Every stitch, every seam, every detail is crafted with meticulous attention to ensure lasting quality that stands the test of time.",
+      bgColor: "from-gray-900 to-gray-700"
+    },
+    {
+      title: "Sustainable",
+      description: "We're committed to responsible practices that protect our planet for future generations through eco-conscious materials and processes.",
+      bgColor: "from-green-600 to-green-500"
+    },
+    {
+      title: "Innovation",
+      description: "We constantly push boundaries while staying true to our core values of simplicity and elegance, creating tomorrow's classics today.",
+      bgColor: "from-blue-600 to-blue-500"
+    }
+  ]
+};
+---
+<section class="py-32 px-6 lg:px-8 font-syne">
+  <div class="mx-auto max-w-7xl">
+    <!-- Header -->
+    <div class="mx-auto max-w-3xl text-center mb-24">
+      <p class="text-xl text-gray-600 leading-relaxed font-medium">
+        {aboutData.header.subtitle}
+      </p>
+    </div>
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-24 items-center mb-24">
+      <!-- Image -->
+      <div class="order-2 lg:order-1">
+        <div class="aspect-[4/5] bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden">
+          <img 
+            src={aboutData.image.src}
+            alt={aboutData.image.alt}
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+          />
+        </div>
+      </div>
+      <!-- Text Content -->
+      <div class="order-1 lg:order-2 space-y-10">
+        <div>
+          <h3 class="text-3xl font-bold text-gray-900 mb-6">{aboutData.philosophy.title}</h3>
+          {aboutData.philosophy.paragraphs.map(paragraph => (
+            <p class="text-gray-600 leading-relaxed mb-6 text-lg">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+        <div>
+          <h3 class="text-3xl font-bold text-gray-900 mb-6">{aboutData.process.title}</h3>
+          <p class="text-gray-600 leading-relaxed text-lg">
+            {aboutData.process.description}
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- Stats Section -->
+    <div class="border-t border-gray-200 pt-20">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
+        {aboutData.stats.map(stat => (
+          <div class="text-center group">
+            <div class="text-4xl lg:text-5xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300">{stat.value}</div>
+            <div class="text-sm uppercase tracking-widest text-gray-500 font-semibold">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <!-- Values Section -->
+    <div class="mt-24 pt-20 border-t border-gray-200">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+        {aboutData.values.map(value => (
+          <div class="text-center group hover:transform hover:-translate-y-2 transition-all duration-300">
+            <div class={`w-12 h-12 bg-gradient-to-br ${value.bgColor} rounded-xl mx-auto mb-6 flex items-center justify-center`}>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>
+            <p class="text-gray-600 leading-relaxed text-sm">
+              {value.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
