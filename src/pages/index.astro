@@ -14,7 +14,7 @@ const products = await getProducts({ buyerIP: ip });
 setCache.short(Astro);
 ---
 
-<BaseLayout title={title}>
+<BaseLayout title={title} navigation={{variant: 'absolute', enableScrollAnimation: true, id: "home-nav"}}>
   <Hero />
   <!-- <Products products={products} /> -->
    <SeasonDrop />

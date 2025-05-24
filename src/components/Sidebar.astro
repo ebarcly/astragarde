@@ -1,4 +1,23 @@
 ---
+export interface Props {
+  navigationId?: string;
+  id?: string;
+}
+
+const { 
+  navigationId = 'navigation',
+  id = 'sidebar'
+} = Astro.props;
+
+// Generate unique IDs for this sidebar instance
+const overlayId = `${id}-overlay`;
+const sidebarId = `${id}-sidebar`;
+const closeSidebarId = `${id}-closeSidebar`;
+
+// Generate the navigation button IDs that this sidebar should listen to
+const openSidebarId = `${navigationId}-openSidebar`;
+const openSidebarScrolledId = `${navigationId}-openSidebarScrolled`;
+
 const navLinks = [
   { href: "/", text: "Home" },
   { href: "/catalog", text: "Catalog" },
@@ -7,15 +26,14 @@ const navLinks = [
 ];
 ---
 
-<div id="overlay" class="fixed inset-0 z-60 hidden bg-white/30"></div>
-
+<div id={overlayId} class="fixed inset-0 z-60 hidden bg-white/30"></div>
 <div
-  id="sidebar"
+  id={sidebarId}
   class="fixed z-70 flex h-full w-[350px] -translate-x-full flex-col bg-white p-4 transition-all duration-300"
 >
   <div class="flex w-full justify-end">
     <button
-      id="closeSidebar"
+      id={closeSidebarId}
       class="cursor-pointer p-2 text-black hover:text-zinc-900"
     >
       <svg
@@ -50,29 +68,47 @@ const navLinks = [
   </nav>
 </div>
 
-<script>
-  const closeSidebar = document.getElementById("closeSidebar");
-  const openSidebar = document.getElementById("openSidebar");
-  const openSidebarScrolled = document.getElementById("openSidebarScrolled");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
+<script define:vars={{ 
+  closeSidebarId, 
+  openSidebarId, 
+  openSidebarScrolledId, 
+  sidebarId, 
+  overlayId 
+}}>
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', function() {
+    const closeSidebar = document.getElementById(closeSidebarId);
+    const openSidebar = document.getElementById(openSidebarId);
+    const openSidebarScrolled = document.getElementById(openSidebarScrolledId);
+    const sidebar = document.getElementById(sidebarId);
+    const overlay = document.getElementById(overlayId);
 
-  function closeSidebarMenu() {
-    sidebar?.classList.remove("translate-x-0");
-    sidebar?.classList.add("-translate-x-full");
-    overlay?.classList.add("hidden");
-    document.body.classList.remove("overflow-hidden");
-  }
+    function closeSidebarMenu() {
+      sidebar?.classList.remove("translate-x-0");
+      sidebar?.classList.add("-translate-x-full");
+      overlay?.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+    }
 
-  function openSidebarMenu() {
-    sidebar?.classList.remove("-translate-x-full");
-    sidebar?.classList.add("translate-x-0");
-    overlay?.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden");
-  }
+    function openSidebarMenu() {
+      sidebar?.classList.remove("-translate-x-full");
+      sidebar?.classList.add("translate-x-0");
+      overlay?.classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
+    }
 
-  closeSidebar?.addEventListener("click", closeSidebarMenu);
-  openSidebar?.addEventListener("click", openSidebarMenu);
-  openSidebarScrolled?.addEventListener("click", openSidebarMenu);
-  overlay?.addEventListener("click", closeSidebarMenu);
+    // Add event listeners
+    closeSidebar?.addEventListener("click", closeSidebarMenu);
+    openSidebar?.addEventListener("click", openSidebarMenu);
+    openSidebarScrolled?.addEventListener("click", openSidebarMenu);
+    overlay?.addEventListener("click", closeSidebarMenu);
+
+    // Cleanup function
+    window.addEventListener("beforeunload", () => {
+      closeSidebar?.removeEventListener("click", closeSidebarMenu);
+      openSidebar?.removeEventListener("click", openSidebarMenu);
+      openSidebarScrolled?.removeEventListener("click", openSidebarMenu);
+      overlay?.removeEventListener("click", closeSidebarMenu);
+    });
+  });
 </script>

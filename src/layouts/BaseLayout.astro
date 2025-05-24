@@ -8,12 +8,19 @@ import AnnouncementBar from "../components/AnnouncementBar.astro";
 export interface Props {
   title: string;
   description?: string;
+  navigation?: {
+    variant?: "relative" | "absolute",
+    enableScrollAnimation?: boolean;
+    id?: string;
+  };
 }
+
+const defaultNav = ""
 
 const defaultDesc =
   "A lightweight and minimalit Astro starter theme using Shopify with Svelte, Tailwind, and TypeScript.";
 
-const { title, description = defaultDesc } = Astro.props as Props;
+const { title, description = defaultDesc, navigation } = Astro.props as Props;
 ---
 
 <html lang="en">
@@ -32,8 +39,8 @@ const { title, description = defaultDesc } = Astro.props as Props;
     <!-- <AnnouncementBar />
     <CartDrawer client:idle /> -->
     <header>
-      <Sidebar />
-      <Header />
+      <Sidebar navigationId={navigation?.id}/>
+      <Header variant={navigation?.variant} enableScrollAnimation={navigation?.enableScrollAnimation} id={navigation?.id}/>
     </header>
     <main>
       <slot />

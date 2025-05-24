@@ -1,0 +1,29 @@
+---
+import BaseLayout from "$/layouts/BaseLayout.astro";
+import LimitedTime from "$/components/LimitedTime.astro";
+import { setCache } from "$/utils/cache";
+
+const title = "Catalog"
+
+setCache.short(Astro);
+
+// Mockup data for limited time collections
+const limitedTime = [
+  {
+    title: "Shirt A",
+    linkUrl: "/collections/shirt-a",
+    img: "https://placehold.co/600x400?text=Shirt+A",
+  },
+  {
+    title: "Shirt B",
+    linkUrl: "/collections/shirt-b",
+    img: "https://placehold.co/600x400?text=Shirt+B",
+  },
+];
+---
+
+<section>
+  <BaseLayout title={title} navigation={{variant: "relative", enableScrollAnimation: true}}>
+    <LimitedTime products={limitedTime} />
+  </BaseLayout>
+</section>
