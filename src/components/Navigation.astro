@@ -1,0 +1,125 @@
+---
+import Logo from "./Logo.astro";
+import LogoWhite from "$/components/LogoWhite.astro";
+import CartIcon from "$/components/CartIcon.svelte";
+import SearchIcon from "$/svgs/SearchIcon.astro";
+import Hamburger from "$/svgs/Hamburger.astro";
+
+export interface Props {
+  variant?: "absolute" | "relative";
+  enableScrollAnimation?: boolean;
+  id?: string;
+}
+
+const {
+  variant = "absolute",
+  enableScrollAnimation = true,
+  id = "navigation",
+} = Astro.props;
+
+// Generate unique IDs for this instance
+const mainHeaderId = `${id}-mainHeader`;
+const scrolledHeaderId = `${id}-scrolledHeader`;
+const openSidebarId = `${id}-openSidebar`;
+const openSidebarScrolledId = `${id}-openSidebarScrolled`;
+
+// Determine classes based on variant
+const getMainHeaderClasses = () => {
+  const baseClasses =
+    "top-0 z-50 w-full transition-all duration-300 section-padding-x";
+
+  if (variant === "absolute") {
+    return `absolute ${baseClasses}`;
+  } else {
+    return `relative ${baseClasses} bg-mainbg`;
+  }
+};
+
+const getScrolledHeaderClasses = () => {
+  const baseClasses =
+    "hidden fixed top-0 z-40 w-full transition-all duration-300 section-padding-x bg-mainbg";
+  const hiddenClass = enableScrollAnimation ? "translate-y-[-100%]" : "";
+  return `${baseClasses} ${hiddenClass}`;
+};
+
+// Determine which logo and icon colors to use
+const useWhiteIcons = variant === "absolute";
+---
+
+<!-- Main Header -->
+<div id={mainHeaderId} class={getMainHeaderClasses()}>
+  <nav class="grid w-full grid-cols-3 items-center p-8">
+    <div class="flex justify-start">
+      <button id={openSidebarId} class="cursor-pointer">
+        <Hamburger color={useWhiteIcons ? "white" : undefined} />
+      </button>
+    </div>
+
+    <div class="flex justify-center">
+      <a href="/" class="cursor-pointer lg:max-h-8">
+        {useWhiteIcons ? <LogoWhite /> : <Logo />}
+      </a>
+    </div>
+
+    <div class="flex justify-end gap-4">
+      <a><SearchIcon color={useWhiteIcons ? "white" : undefined} /></a>
+      <CartIcon color={useWhiteIcons ? "white" : "black"} client:load />
+    </div>
+  </nav>
+</div>
+
+<!-- Scrolled Header (only render if scroll animation is enabled) -->
+{
+  enableScrollAnimation && (
+    <div id={scrolledHeaderId} class={getScrolledHeaderClasses()}>
+      <nav class="grid w-full grid-cols-3 items-center p-8 border-b">
+        <div class="flex justify-start">
+          <button id={openSidebarScrolledId} class="cursor-pointer">
+            <Hamburger />
+          </button>
+        </div>
+
+        <div class="flex justify-center">
+          <div class="lg:max-h-8">
+            <a href="/" class="cursor-pointer lg:max-h-8">
+              <Logo />
+            </a>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+          <a>
+            <SearchIcon />
+          </a>
+          <CartIcon color="black" client:load />
+        </div>
+      </nav>
+    </div>
+  )
+}
+
+<script define:vars={{ scrolledHeaderId, enableScrollAnimation }}>
+  if (enableScrollAnimation) {
+    const scrolledHeader = document.getElementById(scrolledHeaderId);
+
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        scrolledHeader?.classList.remove("hidden");
+      } else {
+        scrolledHeader.classList.add("hidden");
+      }
+      if (window.scrollY > 200) {
+        scrolledHeader?.classList.remove("translate-y-[-100%]");
+      } else {
+        scrolledHeader?.classList.add("translate-y-[-100%]");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup function for when component is removed
+    window.addEventListener("beforeunload", () => {
+      window.removeEventListener("scroll", handleScroll);
+    });
+  }
+</script>

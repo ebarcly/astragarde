@@ -1,0 +1,187 @@
+---
+export interface Props {
+  options?: string[];
+  defaultValue?: string;
+}
+
+const { 
+  options = [
+    "Featured",
+    "Best selling", 
+    "Alphabetically, A-Z",
+    "Alphabetically, Z-A",
+    "Price, low to high",
+    "Price, high to low",
+    "Date, old to new",
+    "Date, new to old"
+  ],
+  defaultValue = "Alphabetically, A-Z"
+} = Astro.props;
+
+// Generate unique ID for this component instance
+const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="relative inline-block w-72 self-end" data-dropdown={dropdownId}>
+  <!-- Main dropdown button -->
+  <button 
+    type="button" 
+    class="sorter-button w-full px-4 py-3 text-left bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between text-sm"
+    aria-haspopup="true"
+    aria-expanded="false"
+  >
+    <span class="current-selection text-gray-900">{defaultValue}</span>
+    <svg class="sorter-chevron w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <!-- Dropdown menu -->
+  <div class="sorter-dropdown absolute z-10 w-full mt-1 bg-white border border-gray-300 shadow-lg right-0 hidden">
+    <!-- Sort label -->
+    <div class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border-b border-gray-200">
+      Sort
+    </div>
+    
+    <!-- Options list -->
+    <ul class="max-h-60 overflow-auto">
+      {options.map((option) => (
+        <li>
+          <button
+            type="button"
+            class={`sorter-option w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${
+              option === defaultValue 
+                ? 'bg-blue-600 text-white' 
+                : 'text-gray-900'
+            }`}
+            data-value={option}
+          >
+            {option}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<script>
+  // Handle dropdown functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const dropdowns = document.querySelectorAll('[data-dropdown]');
+    
+    dropdowns.forEach(dropdown => {
+      const button = dropdown.querySelector('.sorter-button');
+      const menu = dropdown.querySelector('.sorter-dropdown');
+      const chevron = dropdown.querySelector('.sorter-chevron');
+      const currentSelection = dropdown.querySelector('.current-selection');
+      const options = dropdown.querySelectorAll('.sorter-option');
+      
+      let isOpen = false;
+      
+      // Toggle dropdown
+      function toggleDropdown() {
+        isOpen = !isOpen;
+        menu.classList.toggle('hidden', !isOpen);
+        button.setAttribute('aria-expanded', isOpen.toString());
+        chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
+      
+      // Close dropdown
+      function closeDropdown() {
+        if (isOpen) {
+          isOpen = false;
+          menu.classList.add('hidden');
+          button.setAttribute('aria-expanded', 'false');
+          chevron.style.transform = 'rotate(0deg)';
+        }
+      }
+      
+      // Update selection
+      function updateSelection(newValue) {
+        currentSelection.textContent = newValue;
+        
+        // Update option styles
+        options.forEach(option => {
+          const value = option.getAttribute('data-value');
+          if (value === newValue) {
+            option.classList.remove('text-gray-900');
+            option.classList.add('bg-blue-600', 'text-white');
+          } else {
+            option.classList.remove('bg-blue-600', 'text-white');
+            option.classList.add('text-gray-900');
+          }
+        });
+        
+        // Dispatch custom event for parent components to listen to
+        dropdown.dispatchEvent(new CustomEvent('sorter-change', {
+          detail: { value: newValue },
+          bubbles: true
+        }));
+      }
+      
+      // Event listeners
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown();
+      });
+      
+      options.forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const value = option.getAttribute('data-value');
+          updateSelection(value);
+          closeDropdown();
+        });
+      });
+      
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          closeDropdown();
+        }
+      });
+      
+      // Close on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) {
+          closeDropdown();
+          button.focus();
+        }
+      });
+      
+      // Keyboard navigation
+      button.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleDropdown();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          toggleDropdown();
+          if (options.length > 0) {
+            options[0].focus();
+          }
+        }
+      });
+      
+      options.forEach((option, index) => {
+        option.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const value = option.getAttribute('data-value');
+            updateSelection(value);
+            closeDropdown();
+            button.focus();
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const nextIndex = (index + 1) % options.length;
+            options[nextIndex].focus();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prevIndex = index === 0 ? options.length - 1 : index - 1;
+            options[prevIndex].focus();
+          }
+        });
+      });
+    });
+  });
+</script>

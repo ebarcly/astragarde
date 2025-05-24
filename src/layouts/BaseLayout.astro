@@ -1,5 +1,5 @@
 ---
-import Header from "../components/Header.astro";
+import Navigation from "../components/Navigation.astro";
 import Footer from "../components/Footer.astro";
 import Sidebar from "../components/Sidebar.astro";
 import CartDrawer from "../components/CartDrawer.svelte";
@@ -8,12 +8,19 @@ import AnnouncementBar from "../components/AnnouncementBar.astro";
 export interface Props {
   title: string;
   description?: string;
+  navigation?: {
+    variant?: "relative" | "absolute",
+    enableScrollAnimation?: boolean;
+    id?: string;
+  };
 }
+
+const defaultNav = ""
 
 const defaultDesc =
   "A lightweight and minimalit Astro starter theme using Shopify with Svelte, Tailwind, and TypeScript.";
 
-const { title, description = defaultDesc } = Astro.props as Props;
+const { title, description = defaultDesc, navigation } = Astro.props as Props;
 ---
 
 <html lang="en">
@@ -29,11 +36,11 @@ const { title, description = defaultDesc } = Astro.props as Props;
     </style>
   </head>
   <body class="bg-mainbg">
-    <!-- <AnnouncementBar />
-    <CartDrawer client:idle /> -->
+    <!-- <AnnouncementBar /> -->
+    <CartDrawer client:idle /> 
     <header>
-      <Sidebar />
-      <Header />
+      <Sidebar navigationId={navigation?.id}/>
+      <Navigation variant={navigation?.variant} enableScrollAnimation={navigation?.enableScrollAnimation} id={navigation?.id}/>
     </header>
     <main>
       <slot />

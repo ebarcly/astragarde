@@ -45,15 +45,15 @@
 
 {#if $isCartDrawerOpen}
   <div
-    class="relative z-50"
+    class="relative z-70"
     aria-labelledby="slide-over-title"
     role="dialog"
     aria-modal="true"
   >
     <div
-      in:fade={{ duration: 500 }}
-      out:fade={{ duration: 500 }}
-      class="fixed inset-0 bg-slate-400/50 backdrop-blur-sm transition-opacity"
+      in:fade={{ duration: 200 }}
+      out:fade={{ duration: 200 }}
+      class="fixed inset-0 bg-white/30 transition-opacity"
 ></div>
 
     <div class="fixed inset-0 overflow-hidden">
@@ -71,12 +71,12 @@
             class="pointer-events-auto w-screen max-w-lg max-h-screen bg-white"
           >
             <div class="flex flex-col min-h-full max-h-screen">
-              <div class="flex items-start justify-between shadow-sm p-5">
+              <div class="flex items-start justify-between p-5">
                 <h2
-                  class="text-2xl flex gap-4 items-center font-bold text-zinc-800"
+                  class="text-4xl flex gap-4 items-center font-bold font-primary text-zinc-800"
                   id="slide-over-title"
                 >
-                  Your cart
+                  CART
                   {#if $isCartUpdating}
                     <svg
                       class="animate-spin -ml-1 mr-3 h-4 w-4"
@@ -104,7 +104,7 @@
                   <button
                     onclick={() => closeCartDrawer()}
                     type="button"
-                    class="-m-2 p-2 text-gray-400 hover:text-gray-500"
+                    class="-m-2 p-2 text-black"
                   >
                     <span class="sr-only">Close panel</span>
                     <!-- Heroicon name: outline/x-mark -->
@@ -113,7 +113,7 @@
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke-width="1.5"
+                      stroke-width="0.5"
                       stroke="currentColor"
                       aria-hidden="true"
                     >
@@ -195,15 +195,8 @@
                       {/each}
                     </ul>
                   {:else}
-                    <div class="text-center mt-20">
-                      <p class="text-gray-500">Your cart is empty</p>
-                      <a
-                        href="/"
-                        class="font-semibold text-emerald-900 hover:text-emerald-700"
-                      >
-                        Continue Shopping
-                        <span aria-hidden="true"> &rarr;</span>
-                      </a>
+                    <div class="mt-4">
+                      <p class="text-black font-primary">Your cart is currently empty.</p>
                     </div>
                   {/if}
                 </div>

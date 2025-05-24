@@ -1,0 +1,47 @@
+---
+import BaseLayout from "$/layouts/BaseLayout.astro";
+import LimitedTime from "$/components/LimitedTime.astro";
+import { setCache } from "$/utils/cache";
+import { getProducts } from "$/utils/shopify";
+import Products from "$/components/Products.astro";
+import Filters from "$/components/Filters.astro";
+import Sorter from "$/components/Sorter.astro";
+
+const title = "Catalog";
+const headers = Astro.request.headers;
+const ip = headers.get("x-vercel-forwarded-for") || Astro.clientAddress;
+const products = await getProducts({ buyerIP: ip });
+
+setCache.short(Astro);
+
+// Mockup data for limited time collections
+const limitedTime = [
+  {
+    title: "Shirt A",
+    linkUrl: "/collections/shirt-a",
+    img: "https://placehold.co/400x500?text=Shirt+A",
+  },
+  {
+    title: "Shirt B",
+    linkUrl: "/collections/shirt-b",
+    img: "https://placehold.co/400x500?text=Shirt+B",
+  },
+];
+---
+
+<section>
+  <BaseLayout
+    title={title}
+    navigation={{ variant: "relative", enableScrollAnimation: true }}
+  >
+    <LimitedTime products={limitedTime} />
+    <div class="section-padding-x flex">
+      <Filters />
+      <div class="mb-6 flex flex-col">
+        <Sorter />
+
+        <Products products={products} />
+      </div>
+    </div>
+  </BaseLayout>
+</section>
