@@ -120,31 +120,49 @@ const {
     </div>
   </div>
 
-  <div id="seasonProducts" class="section-padding-x!">
+  <div id="seasonProducts" class="section-padding-x! mt-16 mb-16">
     <Products products={mockupProducts} />
   </div>
+
   <!-- paragraph -->
   <div class="section-padding-x!">
-    <p class="text-center text-sm text-zinc-800 font-primary font-bold uppercase tracking-wider mb-16">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+    <p class="text-center text-lg text-zinc-800 font-primary font-medium tracking-wider mb-16">
+      Trendy tracksuits and sunglasses designed for the fearless fashionista.
     </p>
   </div>
+
   <!-- Video hero -->
-  <div class="section-padding-x! relative h-[500px] overflow-hidden bg-black rounded-lg text-center">
-    <video src="https://cdn.shopify.com/videos/c/o/v/ca1684baee104031893a6ca94b5e59d4.mp4" class="w-full h-full object-cover" autoplay muted loop></video>
+  <div class="section-padding-x! relative h-[500px] overflow-hidden bg-black md:rounded-lg text-center" data-video-hero>
+    <video src="https://cdn.shopify.com/videos/c/o/v/ca1684baee104031893a6ca94b5e59d4.mp4" class="w-full h-full object-cover" autoplay muted loop playsinline webkit-playsinline></video>
     <div class="absolute inset-0 bg-black opacity-50"></div>
-    <div class="absolute bottom-0 left-0 right-0 p-4">
+    <div class="flex justify-center flex-col h-full absolute bottom-0 left-0 right-0 p-4 z-10">
       <h2 class="text-white text-4xl font-bold font-primary uppercase tracking-wider text-center mb-4">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        Redefining the ordinary
       </h2>
-      <p class="text-white text-sm font-primary font-bold uppercase tracking-wider text-center mb-4">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+      <p class="text-white text-sm font-primary font-medium tracking-wider text-center text-balance mb-4">
+        We revolutionize urban style with our fearless approach to fashion, crafting tracksuits, clothes, and sunglasses that empower self-expression.
       </p>
     </div>
   </div>
+
   <!-- products -->
-  <div class="section-padding-x!">
+  <div class="section-padding-x! mt-16 mb-16">
     <Products products={mockupProducts} />
+  </div>
+
+  <!-- horizontal scrolling text -->
+  <div class="scrolling-text" style="--move-speed: 20s;">
+    <div class="scrolling-text__inner">
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    </div>
+  </div>
+
+  <!-- 2 column grid -->
+  <div class="flex flex-col lg:flex-row">
+    <div class="w-full lg:w-1/2"></div>
   </div>
 </section>
 
@@ -250,5 +268,53 @@ const {
   #countdown-seconds {
     min-width: 2ch;
     display: inline-block;
+  }
+
+  /* Scrolling text styles */
+  .scrolling-text {
+    overflow: hidden;
+    direction: ltr;
+    width: 100%;
+    background: transparent;
+    margin: 2rem 0;
+  }
+  .scrolling-text__inner {
+    visibility: visible;
+    white-space: nowrap;
+    display: inline-flex;
+    margin: 0.15em 0;
+    animation: scrolling-text var(--move-speed, 20s) linear infinite;
+    animation-play-state: running;
+  }
+  .scrolling-text__inner--right {
+    animation: scrolling-text-right var(--move-speed, 20s) linear infinite;
+  }
+  .scrolling-text span {
+    white-space: nowrap;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111;
+    letter-spacing: 0.1em;
+    font-family: inherit;
+  }
+  .scrolling-text:hover .scrolling-text__inner,
+  .scrolling-text:focus .scrolling-text__inner {
+    animation-play-state: paused;
+  }
+  @keyframes scrolling-text {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes scrolling-text-right {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0);
+    }
   }
 </style>
