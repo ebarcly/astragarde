@@ -19,3 +19,7 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# MCP
+.cursor/mcp.json
+mcp.json
