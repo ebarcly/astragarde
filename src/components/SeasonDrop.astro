@@ -29,6 +29,7 @@ const {
 } = Astro.props;
 ---
 
+<!-- Season Drop -->
 <section class="section-padding-x! data-countdown-section py-20 sm:px-20">
   <div id="countdownSection" class="mx-auto">
     <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-3">
@@ -114,7 +115,7 @@ const {
       <div class="flex justify-center lg:col-span-1 lg:justify-end">
         <a
           href={buttonUrl}
-          class="button"
+          class="inline-flex items-center justify-center bg-black text-white px-4 py-2 rounded-sm"
         >
           {buttonText}
         </a>
@@ -155,7 +156,18 @@ const {
       <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
       <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
       <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
     </div>
+  </div>
+
+  <!-- products -->
+  <div id="seasonProducts" class="section-padding-x! mt-16 mb-16">
+    <Products products={products.slice(0, 8)} layout="horizontal" />
   </div>
 
   <!-- 2 column grid -->

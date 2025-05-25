@@ -9,7 +9,7 @@ export interface Props {
   gap?: number;
   layout?: 'horizontal' | 'grid';
 }
-const { products, gap = 6, layout = 'grid' } = Astro.props as Props;
+const { products, gap = 4, layout = 'grid' } = Astro.props as Props;
 ---
 
 <section>
@@ -17,9 +17,9 @@ const { products, gap = 6, layout = 'grid' } = Astro.props as Props;
     <h2 class="sr-only">Products</h2>
 
     {layout === 'horizontal' ? (
-      <div class={`flex flex-row gap-${gap ?? 2} overflow-x-auto`}>
+      <div class={`flex flex-row gap-${gap ?? 2} overflow-x-auto w-screen -mx-4 sm:-mx-8 md:-mx-16 lg:-mx-32 px-0 scrollbar-none`} style="scrollbar-width: none;">
         {products.map((product) => (
-          <div class="min-w-[170px] max-w-[180px] flex-shrink-0 bg-white hadow-sm overflow-hidden">
+          <div class="min-w-[170px] sm:min-w-[220px] md:min-w-[260px] lg:min-w-[300px] max-w-[90vw] flex-shrink-0 bg-white rounded-lg shadow-sm overflow-hidden flex flex-col h-full">
             <ProductCard product={product} />
           </div>
         ))}
@@ -35,3 +35,13 @@ const { products, gap = 6, layout = 'grid' } = Astro.props as Props;
     )}
   </div>
 </section>
+
+<style>
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
