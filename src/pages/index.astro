@@ -2,8 +2,12 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SeasonDrop from "../components/SeasonDrop.astro";
 import Hero from "../components/Hero.astro";
+import { getProducts } from "../utils/shopify";
 
 const title = "Astragarde";
+const headers = Astro.request.headers;
+const ip = headers.get("x-vercel-forwarded-for") || Astro.clientAddress;
+const products = await getProducts({ limit: 8, buyerIP: ip });
 ---
 
 <BaseLayout
@@ -15,5 +19,5 @@ const title = "Astragarde";
   }}
 >
   <Hero />
-  <SeasonDrop />
+  <SeasonDrop products={products} />
 </BaseLayout>

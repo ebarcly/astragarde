@@ -1,0 +1,55 @@
+<script lang="ts">
+  import { filters } from "$/stores/filters";
+  import { sort, getSortQuery, type SortOption } from "$/stores/sort";
+  import { onMount } from "svelte";
+  import Products from "$/components/Products.svelte";
+
+  let { buyerIp } = $props<{ buyerIp: string }>();
+
+  let products = $state([]);
+  let isLoading = $state(true); // loading state
+
+  async function fetchProducts(currentFilters: any, currentSort: SortOption) {
+    isLoading = true;
+    const params = new URLSearchParams(currentFilters);
+    
+    // Add required parameters
+    params.set('buyerIp', buyerIp);
+    const { sortKey, reverse } = getSortQuery(currentSort);
+    params.set('sortKey', sortKey);
+    params.set('reverse', reverse.toString());
+    
+    try {
+      const res = await fetch(`/api/products?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      products = await res.json();
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  onMount(() => {
+    fetchProducts(filters.value, sort.get());
+  });
+
+  // Subscribe to both filters and sort changes
+  filters.subscribe((val) => {
+    fetchProducts(val, sort.get());
+  });
+
+  sort.subscribe((val) => {
+    fetchProducts(filters.value, val);
+  });
+</script>
+
+{#if isLoading}
+  <div class="py-20 text-center text-gray-500 h-screen">Cargando productos...</div>
+{:else}
+  <Products {products} />
+{/if}

@@ -9,6 +9,7 @@ import {
   GetCartQuery,
   RemoveCartLinesMutation,
   ProductRecommendationsQuery,
+  UpdateCartLinesMutation,
 } from "./graphql";
 
 // Make a request to Shopify's GraphQL API  and return the data object from the response body as JSON data.
@@ -70,12 +71,20 @@ const makeShopifyRequest = async (
 export const getProducts = async (options: {
   limit?: number;
   buyerIP: string;
+  query?: string;
+  sortKey?: string;
+  reverse?: boolean;
 }) => {
-  const { limit = 10, buyerIP } = options;
+  const { limit = 10, buyerIP, query, sortKey, reverse } = options;
 
   const data = await makeShopifyRequest(
     ProductsQuery,
-    { first: limit },
+    { 
+      first: limit,
+      query,
+      sortKey: sortKey || undefined,
+      reverse: reverse || false
+    },
     buyerIP
   );
   const { products } = data;
@@ -167,6 +176,18 @@ export const removeCartLines = async (id: string, lineIds: string[]) => {
   });
   const { cartLinesRemove } = data;
   const { cart } = cartLinesRemove;
+  const parsedCart = CartResult.parse(cart);
+
+  return parsedCart;
+};
+
+export const updateCartLines = async (id: string, lines: { id: string; quantity: number }[]) => {
+  const data = await makeShopifyRequest(UpdateCartLinesMutation, {
+    cartId: id,
+    lines,
+  });
+  const { cartLinesUpdate } = data;
+  const { cart } = cartLinesUpdate;
   const parsedCart = CartResult.parse(cart);
 
   return parsedCart;

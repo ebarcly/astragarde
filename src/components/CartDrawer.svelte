@@ -7,12 +7,13 @@
     isCartDrawerOpen,
     removeCartItems,
     isCartUpdating,
+    updateCartItemQuantity,
   } from "../stores/cart";
   import ShopifyImage from "./ShopifyImage.svelte";
   import Money from "./Money.svelte";
   import { clickOutside } from "../utils/click-outside";
 
-  let cartDrawerEl: HTMLDivElement = $state();
+  let cartDrawerEl: HTMLDivElement | undefined = $state();
 
   // Add classes to cart line items if cart is updating
   let cartIsUpdatingClass = $derived($isCartUpdating
@@ -41,6 +42,31 @@
       closeCartDrawer();
     }
   }
+
+  function updateQuantity(id: string, newQuantity: number) {
+    if (newQuantity > 0) {
+      updateCartItemQuantity(id, newQuantity);
+    }
+  }
+
+  // Get selected options (size and color) from the variant title
+  function getSelectedOptions(title: string) {
+    const options = title.split(' / ');
+    const result: { size?: string; color?: string } = {};
+    
+    options.forEach(option => {
+      if (option.toLowerCase().includes('size')) {
+        result.size = option.split(': ')[1];
+      } else if (option.toLowerCase().includes('color')) {
+        result.color = option.split(': ')[1];
+      } else {
+        // If no prefix, assume it's a color
+        result.color = option;
+      }
+    });
+    
+    return result;
+  }
 </script>
 
 {#if $isCartDrawerOpen}
@@ -54,7 +80,7 @@
       in:fade={{ duration: 200 }}
       out:fade={{ duration: 200 }}
       class="fixed inset-0 bg-white/30 transition-opacity"
-></div>
+    ></div>
 
     <div class="fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
@@ -136,6 +162,7 @@
                       class="divide-y divide-zinc-100 {cartIsUpdatingClass}"
                     >
                       {#each $cart.lines?.nodes as item}
+                        {@const selectedOptions = getSelectedOptions(item.merchandise.title)}
                         <li class="grid py-8 grid-cols-12 gap-3">
                           <div
                             class="overflow-hidden rounded-lg col-span-3 lg:col-span-2"
@@ -156,9 +183,34 @@
                             >
                               {item.merchandise.product.title}
                             </a>
+                            {#if selectedOptions.size}
+                              <p class="text-sm text-gray-500">Size: {selectedOptions.size}</p>
+                            {/if}
+                            {#if selectedOptions.color}
+                              <p class="text-sm text-gray-500">Color: {selectedOptions.color}</p>
+                            {/if}
                             <p class="text-xs">
-                              <Money price={item.cost.amountPerQuantity} />
+                              <Money price={item.cost.amountPerQuantity} showCurrency={false} />
                             </p>
+                            <div class="flex items-center gap-2">
+                              <button
+                                type="button"
+                                class="w-8 h-8 flex items-center justify-center border rounded-md hover:bg-gray-100"
+                                onclick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={$isCartUpdating}
+                              >
+                                -
+                              </button>
+                              <span class="w-8 text-center">{item.quantity}</span>
+                              <button
+                                type="button"
+                                class="w-8 h-8 flex items-center justify-center border rounded-md hover:bg-gray-100"
+                                onclick={() => updateQuantity(item.id, item.quantity + 1)}
+                                disabled={$isCartUpdating}
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
                           <div
                             class="col-span-2 items-end flex justify-between flex-col"
@@ -187,7 +239,7 @@
                             </button>
                             <div>
                               <p class="font-medium">
-                                <Money price={item.cost.totalAmount} />
+                                <Money price={item.cost.totalAmount} showCurrency={false} />
                               </p>
                             </div>
                           </div>

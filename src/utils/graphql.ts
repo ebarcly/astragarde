@@ -71,6 +71,14 @@ fragment productFragment on Product {
         amount
         currencyCode
       }
+      compareAtPrice {
+        amount
+        currencyCode
+      }
+      selectedOptions {
+        name
+        value
+      }
     }
   }
   featuredImage {
@@ -83,8 +91,8 @@ fragment productFragment on Product {
 `;
 
 export const ProductsQuery = `#graphql
-query ($first: Int!) {
-    products(first: $first) {
+query ($first: Int!, $query: String, $sortKey: ProductSortKeys, $reverse: Boolean) {
+    products(first: $first, query: $query, sortKey: $sortKey, reverse: $reverse) {
       edges {
         node {
           ...productFragment
@@ -155,6 +163,21 @@ export const AddCartLinesMutation = `#graphql
 export const RemoveCartLinesMutation = `#graphql
   mutation ($cartId: ID!, $lineIds: [ID!]!) {
     cartLinesRemove (cartId: $cartId, lineIds: $lineIds) {
+      cart {
+        ...cartFragment
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+  ${CART_FRAGMENT}
+`;
+
+export const UpdateCartLinesMutation = `#graphql
+  mutation ($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+    cartLinesUpdate (cartId: $cartId, lines: $lines) {
       cart {
         ...cartFragment
       }

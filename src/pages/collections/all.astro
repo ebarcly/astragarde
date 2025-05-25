@@ -3,9 +3,9 @@ import BaseLayout from "$/layouts/BaseLayout.astro";
 import LimitedTime from "$/components/LimitedTime.astro";
 import { setCache } from "$/utils/cache";
 import { getProducts } from "$/utils/shopify";
-import Products from "$/components/Products.astro";
 import Filters from "$/components/Filters.astro";
 import Sorter from "$/components/Sorter.astro";
+import ProductsWrapper from "$/components/blocks/products/ProductsWrapper.svelte"
 
 const title = "Catalog";
 const headers = Astro.request.headers;
@@ -29,19 +29,50 @@ const limitedTime = [
 ];
 ---
 
-<section>
-  <BaseLayout
-    title={title}
-    navigation={{ variant: "relative", enableScrollAnimation: true }}
-  >
-    <LimitedTime products={limitedTime} />
-    <div class="section-padding-x flex">
-      <Filters />
-      <div class="mb-6 flex flex-col">
-        <Sorter />
-
-        <Products products={products} />
-      </div>
+<BaseLayout title={title} navigation={{ variant: "relative", enableScrollAnimation: true }}>
+  <LimitedTime products={limitedTime} />
+  <div class="section-padding-x grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Sidebar Filters (collapsible on mobile) -->
+    <!-- Mobile Filter Button -->
+    <div class="block lg:hidden mb-4">
+      <button 
+        class="w-full bg-zinc-100 rounded-lg py-2 font-bold text-zinc-900 border border-zinc-200"
+        onclick="document.getElementById('mobileFilter').classList.remove('hidden')"
+      >
+        Filter
+      </button>
     </div>
-  </BaseLayout>
-</section>
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:block lg:col-span-3">
+      <Filters />
+    </aside>
+    <!-- Mobile Filter Drawer/Modal -->
+    <div id="mobileFilter" class="fixed inset-0 z-50 bg-black/40 hidden lg:hidden transition-all duration-300">
+      <div class="absolute left-0 top-0 h-full w-4/5 max-w-xs bg-white shadow-lg p-6 overflow-y-auto">
+        <button 
+          class="mb-4 text-zinc-900 font-bold"
+          onclick="document.getElementById('mobileFilter').classList.add('hidden')"
+        >
+          Close
+        </button>
+        <Filters />
+      </div>
+      <!-- Click outside to close -->
+      <div class="absolute inset-0" onclick="document.getElementById('mobileFilter').classList.add('hidden')"></div>
+    </div>
+    <!-- Main Content -->
+    <main class="lg:col-span-9">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        <div class="w-full sm:w-72 ml-auto">
+          <Sorter />
+        </div>
+      </div>
+      <ProductsWrapper client:load buyerIp={ip}/>
+      <!-- {products.length === 0 ? (
+        <div class="text-center text-zinc-500 py-20 text-lg">No products found. Try adjusting your filters.</div>
+      ) : (
+        <Products products={products} gap={6} layout="grid" />
+      )} -->
+    </main>
+  </div>
+</BaseLayout>

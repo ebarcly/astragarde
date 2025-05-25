@@ -1,6 +1,6 @@
 ---
 import { getProductRecommendations } from "../utils/shopify";
-import ProductCard from "./ProductCard.astro";
+import ProductCard from "./ProductCard.svelte";
 export interface Props {
   productId: string;
   buyerIP: string;
@@ -24,7 +24,9 @@ const productRecommendations = await getProductRecommendations({
 
         <div class="mt-6 grid grid-cols-1 gap-y-10 gap-x-2 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-4">
           {productRecommendations.map((product) => (
+            <div>
             <ProductCard product={product} size="large" />
+            </div>
           ))}
         </div>
       </div>
