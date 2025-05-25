@@ -37,7 +37,7 @@ const getMainHeaderClasses = () => {
 
 const getScrolledHeaderClasses = () => {
   const baseClasses =
-    "hidden fixed top-0 z-40 w-full transition-all duration-300 section-padding-x bg-mainbg";
+    "hidden fixed top-0 z-40 w-full transition-all duration-300 section-padding-x bg-mainbg border-b";
   const hiddenClass = enableScrollAnimation ? "translate-y-[-100%]" : "";
   return `${baseClasses} ${hiddenClass}`;
 };
@@ -72,7 +72,7 @@ const useWhiteIcons = variant === "absolute";
 {
   enableScrollAnimation && (
     <div id={scrolledHeaderId} class={getScrolledHeaderClasses()}>
-      <nav class="grid w-full grid-cols-3 items-center p-8 border-b">
+      <nav class="grid w-full grid-cols-3 items-center p-8">
         <div class="flex justify-start">
           <button id={openSidebarScrolledId} class="cursor-pointer">
             <Hamburger />
