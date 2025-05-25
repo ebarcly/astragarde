@@ -1,138 +1,81 @@
- <div class="container mx-auto max-w-4xl px-4 py-16">
-    <!-- Get in Touch Section -->
-    <section class="mb-16 text-center">
-      <h1
-        class="mb-6 text-4xl font-bold tracking-wide text-gray-900 md:text-5xl"
-      >
-        GET IN TOUCH
-      </h1>
-      <p
-        class="mx-auto max-w-2xl text-lg leading-relaxed text-gray-600 md:text-xl"
-      >
-        Use this text to share information about your brand with your customers.
-        Describe a product, share announcements, or welcome customers to your
-        store.
-      </p>
-    </section>
+<div class="container mx-auto max-w-2xl px-4 py-8">
+  <!-- Get in Touch Section -->
+  <section class="mb-10 text-center">
+    <h2 class="mb-4 text-3xl font-bold tracking-wide uppercase text-zinc-900">Contact Us</h2>
+    <p class="mx-auto max-w-xl text-lg leading-relaxed text-zinc-600">
+      We're here to help! Please fill out the form below and we'll get back to you soon.
+    </p>
+  </section>
 
-    <!-- Contact Form Section -->
-    <section class="rounded-lg p-8 md:p-12">
-      <h2
-        class="mb-8 text-3xl font-bold tracking-wide text-gray-900 md:text-4xl"
-      >
-        CONTACT US
-      </h2>
-
-      <form class="space-y-6">
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <!-- Name Field -->
-          <div>
-            <label
-              for="name"
-              class="mb-2 block text-sm font-medium tracking-wider text-gray-700 uppercase"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              class="w-full rounded-md border border-gray-300 px-4 py-3 transition-colors duration-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-
-          <!-- Email Field -->
-          <div>
-            <label
-              for="email"
-              class="mb-2 block text-sm font-medium tracking-wider text-gray-700 uppercase"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              class="w-full rounded-md border border-gray-300 px-4 py-3 transition-colors duration-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-        </div>
-
-        <!-- Message Field -->
+  <!-- Contact Form Section -->
+  <section class="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+    <!-- Success message placeholder -->
+    <div id="contact-success" class="hidden mb-6 text-green-700 bg-green-100 rounded p-4 text-center font-medium">
+      Thank you for your message! We'll get back to you soon.
+    </div>
+    <form class="space-y-6" id="contact-form">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <!-- Name Field -->
         <div>
-          <label
-            for="message"
-            class="mb-2 block text-sm font-medium tracking-wider text-gray-700 uppercase"
-          >
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            rows="6"
-            required
-            class="resize-vertical w-full rounded-md border border-gray-300 px-4 py-3 transition-colors duration-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500"
-          ></textarea>
+          <label for="name" class="mb-2 block text-sm font-medium tracking-wider text-zinc-700 uppercase">Name</label>
+          <input type="text" id="name" name="name" required class="w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-900 focus:ring-2 focus:ring-zinc-100 transition-colors duration-200" />
         </div>
-
-        <!-- Submit Button -->
-        <div class="flex justify-start">
-          <button
-            type="submit"
-            class="cursor-pointer rounded-md bg-teal-600 px-8 py-3 text-sm font-bold tracking-wider text-white uppercase transition-colors duration-200 hover:bg-teal-700"
-          >
-            Send
-          </button>
+        <!-- Email Field -->
+        <div>
+          <label for="email" class="mb-2 block text-sm font-medium tracking-wider text-zinc-700 uppercase">Email</label>
+          <input type="email" id="email" name="email" required class="w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-900 focus:ring-2 focus:ring-zinc-100 transition-colors duration-200" />
         </div>
+      </div>
+      <!-- Message Field -->
+      <div>
+        <label for="message" class="mb-2 block text-sm font-medium tracking-wider text-zinc-700 uppercase">Message</label>
+        <textarea id="message" name="message" rows="6" required class="resize-vertical w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-900 focus:ring-2 focus:ring-zinc-100 transition-colors duration-200"></textarea>
+      </div>
+      <!-- Submit Button -->
+      <div class="flex justify-end">
+        <button type="submit" class="cursor-pointer rounded-lg bg-zinc-900 px-8 py-3 text-base font-bold tracking-wider text-white uppercase transition-colors duration-200 hover:bg-zinc-800 w-full md:w-auto shadow-md">
+          Send Message
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
 
-        <!-- Privacy Notice -->
-        <p class="mt-6 text-sm text-gray-500">
-          This site is protected by hCaptcha and the hCaptcha Privacy Policy and
-          Terms of Service apply.
-        </p>
-      </form>
-    </section>
-  </div>
-
-  <style>
-    /* Custom styles for enhanced appearance */
-    body {
-      font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-        Cantarell, sans-serif;
+<script>
+  // Add form submission handling
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('contact-form');
+    const successMsg = document.getElementById('contact-success');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        // Here you would typically send the data to your backend
+        // Show success message
+        if (successMsg) {
+          successMsg.classList.remove('hidden');
+        }
+        // Reset form
+        (form as HTMLFormElement).reset();
+      });
     }
+  });
+</script>
 
-    input:focus,
-    textarea:focus {
-      outline: none;
-    }
+<style>
+ 
+  body {
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+      Cantarell, sans-serif;
+  }
 
-    /* Smooth transitions */
-    * {
-      transition: all 0.2s ease-in-out;
-    }
-  </style>
+  input:focus,
+  textarea:focus {
+    outline: none;
+  }
 
-  <script>
-    // Add form submission handling
-    document.querySelector("form")?.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      // Get form data
-      const formData = new FormData(this);
-      const name = formData.get("name");
-      const email = formData.get("email");
-      const message = formData.get("message");
-
-      // Here you would typically send the data to your backend
-      console.log("Form submitted:", { name, email, message });
-
-      // Show success message (replace with your preferred notification method)
-      alert("Thank you for your message! We'll get back to you soon.");
-
-      // Reset form
-      this.reset();
-    });
-  </script>
+  /* Smooth transitions */
+  * {
+    transition: all 0.2s ease-in-out;
+  }
+</style>
