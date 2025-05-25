@@ -6,17 +6,32 @@ import ProductCard from "./ProductCard.astro";
 const ProductsResult = z.array(ProductResult);
 export interface Props {
   products: z.infer<typeof ProductsResult>;
-  gap?: number
+  gap?: number;
+  layout?: 'horizontal' | 'grid';
 }
-const { products, gap = 6 } = Astro.props as Props;
+const { products, gap = 6, layout = 'grid' } = Astro.props as Props;
 ---
 
 <section>
   <div class="container py-16 sm:py-20">
     <h2 class="sr-only">Products</h2>
 
-    <div class=`flex flex-wrap gap-${gap}`>
-      {products.map((product) => <ProductCard product={product} />)}
-    </div>
+    {layout === 'horizontal' ? (
+      <div class={`flex flex-row gap-${gap ?? 2} overflow-x-auto`}>
+        {products.map((product) => (
+          <div class="min-w-[170px] max-w-[180px] flex-shrink-0 bg-white hadow-sm overflow-hidden">
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div class={`grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-${gap}`}>
+        {products.map((product) => (
+          <div>
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 </section>

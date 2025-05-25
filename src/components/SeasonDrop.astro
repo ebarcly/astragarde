@@ -13,6 +13,7 @@ export interface Props {
   buttonUrl?: string;
   endDate?: string; // ISO string format
   backgroundColor?: string;
+  products?: any[];
 }
 
 // Default values (can be overridden by CMS)
@@ -24,6 +25,7 @@ const {
   buttonText = "SHOP COLLECTION",
   buttonUrl = "#",
   endDate = new Date("2025-05-27T00:00:00Z").toISOString(), // The date we'll finish this site
+  products = [],
 } = Astro.props;
 ---
 
@@ -120,13 +122,14 @@ const {
     </div>
   </div>
 
+  <!-- products -->
   <div id="seasonProducts" class="section-padding-x! mt-16 mb-16">
-    <Products products={mockupProducts} />
+    <Products products={products.slice(0, 8)} layout="horizontal" />
   </div>
 
   <!-- paragraph -->
   <div class="section-padding-x!">
-    <p class="text-center text-lg text-zinc-800 font-primary font-medium tracking-wider mb-16">
+    <p class="text-center lg:text-2xl text-zinc-800 font-primary font-medium tracking-wider mb-16">
       Trendy tracksuits and sunglasses designed for the fearless fashionista.
     </p>
   </div>
@@ -143,11 +146,6 @@ const {
         We revolutionize urban style with our fearless approach to fashion, crafting tracksuits, clothes, and sunglasses that empower self-expression.
       </p>
     </div>
-  </div>
-
-  <!-- products -->
-  <div class="section-padding-x! mt-16 mb-16">
-    <Products products={mockupProducts} />
   </div>
 
   <!-- horizontal scrolling text -->

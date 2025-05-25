@@ -65,20 +65,25 @@ const getColorClass = (colorName: string) => {
   href={`/products/${product?.handle}`}
   class="group overflow-hidden block"
 >
+<!-- card container -->
   <div class={cardClasses}>
-    <ShopifyImage
-      classList="h-full w-full object-cover object-center"
-      loading="eager"
-      image={product?.featuredImage}
-      sizes={`
-      (min-width: 1540px) 348px,
-      (min-width: 1280px) 284px,
-      (min-width: 1040px) 309px,
-      (min-width: 780px) 348px,
-      (min-width: 640px) 284px,
-      calc(100vw - 48px)
-    `}
-    />
+    <!-- image container -->
+    <div class="w-full h-full bg-white flex items-center justify-center overflow-hidden">
+      <!-- image -->
+      <ShopifyImage
+        classList="w-full h-full object-cover object-center"
+        loading="eager"
+        image={product?.featuredImage}
+        sizes={`
+          (min-width: 1540px) 348px,
+          (min-width: 1280px) 284px,
+          (min-width: 1040px) 309px,
+          (min-width: 780px) 348px,
+          (min-width: 640px) 284px,
+          calc(100vw - 48px)
+        `}
+      />
+    </div>
     
     <!-- Sale/Sold Out Badge -->
     {isOnSale && !isSoldOut && (
@@ -94,13 +99,11 @@ const getColorClass = (colorName: string) => {
     )}
   </div>
   
-  <div class="flex flex-col justify-between py-2 text-zinc-700">
-    <h3 class="font-primary font-bold mb-1">{product?.title}</h3>
-    
+  <div class="flex flex-col items-center justify-between py-2 text-zinc-700 text-center">
     <!-- Price Section -->
-    <div class="font-primary mb-2">
+    <div class="font-primary mb-1 text-lg font-semibold text-black">
       {isOnSale ? (
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 justify-center">
           <span class="line-through text-gray-500 text-sm">
             <Money price={product?.variants.nodes[0].compareAtPrice} />
           </span>
@@ -112,10 +115,12 @@ const getColorClass = (colorName: string) => {
         <Money price={product?.variants.nodes[0].price} />
       )}
     </div>
-    
+    <h3 class="font-primary font-bold text-base mb-0.5 break-words w-full">
+      {product?.title}
+    </h3>
     <!-- Color Swatches -->
     {colorVariants.length > 0 && (
-      <div class="flex gap-1">
+      <div class="flex gap-1 justify-center mt-1">
         {colorVariants.map((color) => (
           <div 
             class={`w-4 h-4 rounded-full border ${getColorClass(color as string)}`}
