@@ -71,12 +71,13 @@ const makeShopifyRequest = async (
 export const getProducts = async (options: {
   limit?: number;
   buyerIP: string;
+  query?: string;
 }) => {
-  const { limit = 10, buyerIP } = options;
+  const { limit = 10, buyerIP, query } = options;
 
   const data = await makeShopifyRequest(
     ProductsQuery,
-    { first: limit },
+    { first: limit , query },
     buyerIP
   );
   const { products } = data;

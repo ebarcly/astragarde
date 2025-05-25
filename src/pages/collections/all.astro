@@ -3,9 +3,9 @@ import BaseLayout from "$/layouts/BaseLayout.astro";
 import LimitedTime from "$/components/LimitedTime.astro";
 import { setCache } from "$/utils/cache";
 import { getProducts } from "$/utils/shopify";
-import Products from "$/components/Products.astro";
 import Filters from "$/components/Filters.astro";
 import Sorter from "$/components/Sorter.astro";
+import ProductsWrapper from "$/components/blocks/products/ProductsWrapper.svelte"
 
 const title = "Catalog";
 const headers = Astro.request.headers;
@@ -63,16 +63,16 @@ const limitedTime = [
     <!-- Main Content -->
     <main class="lg:col-span-9">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-        <h2 class="text-2xl font-bold text-zinc-900">All Products</h2>
-        <div class="w-full sm:w-72 self-end">
+        <div class="w-full sm:w-72 ml-auto">
           <Sorter />
         </div>
       </div>
-      {products.length === 0 ? (
+      <ProductsWrapper client:load buyerIp={ip}/>
+      <!-- {products.length === 0 ? (
         <div class="text-center text-zinc-500 py-20 text-lg">No products found. Try adjusting your filters.</div>
       ) : (
-        <Products products={products} gap={6} layout="flex" />
-      )}
+        <Products products={products} gap={6} layout="grid" />
+      )} -->
     </main>
   </div>
 </BaseLayout>

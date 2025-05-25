@@ -2,13 +2,24 @@
 // FilterComponent.astro
 ---
 <div class="p-6 rounded-lg w-sm">
-  <!-- Active Filter Tag -->
-  <div id="activeFilterTag" class="mb-4 hidden">
-    <div class="bg-green-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium">
-      <span>IN STOCK</span>
+  <!-- Active Filter Tags -->
+  <div id="activeFilterTags" class="mb-4 space-y-2 hidden">
+    <div id="availabilityTag" class="bg-green-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden">
+      <span></span>
       <button 
         class="ml-2 text-white hover:text-gray-200"
-        onclick="console.log('Remove filter clicked')"
+        data-filter="availability"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div id="priceTag" class="bg-blue-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden">
+      <span></span>
+      <button 
+        class="ml-2 text-white hover:text-gray-200"
+        data-filter="price"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -16,76 +27,80 @@
       </button>
     </div>
   </div>
+
   <!-- Availability Filter -->
   <div class="mb-8">
     <button 
-      class="flex items-center justify-between text-left mb-4 focus:outline-none"
-      onclick="console.log('Availability filter toggled')"
+      class="flex items-center justify-between text-left mb-4 focus:outline-none w-full"
+      id="availabilityToggle"
     >
       <h3 class="text-sm font-medium tracking-wider uppercase text-gray-900">
         Availability
       </h3>
-      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="availabilityArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
       </svg>
     </button>
     
-    <div class="space-y-3">
+    <div class="space-y-3" id="availabilityOptions">
       <button 
-        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded"
-        onclick="console.log('In stock filter clicked')"
+        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded w-full"
         id="inStockButton"
+        data-availability="true"
       >
-        <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">
+        <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center border border-gray-300">
           <div class="w-3 h-3 bg-black hidden" id="inStockCheck"></div>
         </div>
-        <span class="text-gray-900" id="inStockText">In stock (4)</span>
+        <span class="text-gray-900" id="inStockText">In stock</span>
       </button>
       
       <button 
-        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded"
-        onclick="console.log('Out of stock filter clicked')"
+        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded w-full"
         id="outOfStockButton"
+        data-availability="false"
       >
-        <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">
+        <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center border border-gray-300">
           <div class="w-3 h-3 bg-black hidden" id="outOfStockCheck"></div>
         </div>
-        <span class="text-gray-900" id="outOfStockText">Out of stock (3)</span>
+        <span class="text-gray-900" id="outOfStockText">Out of stock</span>
       </button>
     </div>
   </div>
+
   <!-- Price Filter -->
   <div>
     <button 
-      class="flex items-center justify-between text-left mb-4 focus:outline-none"
-      onclick="console.log('Price filter toggled')"
+      class="flex items-center justify-between text-left mb-4 focus:outline-none w-full"
+      id="priceToggle"
     >
       <h3 class="text-sm font-medium tracking-wider uppercase text-gray-900">
         Price
       </h3>
-      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="priceArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
       </svg>
     </button>
     
-    <div class="space-y-4">
+    <div class="space-y-4" id="priceOptions">
       <!-- Price Range Display -->
       <div class="flex justify-between text-sm text-gray-900">
-        <span>$0.00</span>
-        <span>$199.00</span>
+        <span id="minPriceDisplay">$0.00</span>
+        <span id="maxPriceDisplay">$199.00</span>
       </div>
       
       <!-- Price Range Slider -->
-      <div class="relative w-full max-w-xs mx-auto">
+      <div class="relative w-full max-w-xs mx-auto" id="priceSlider">
         <div class="h-2 bg-gray-200 rounded-full">
-          <div class="h-2 bg-gray-800 rounded-full relative" style="width: 60%;">
+          <div class="h-2 bg-gray-800 rounded-full relative" id="priceRange">
             <!-- Left Handle -->
             <div 
               class="absolute -top-1 -left-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow"
+              id="minHandle"
             ></div>
             <!-- Right Handle -->
             <div 
               class="absolute -top-1 -right-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow"
+              id="maxHandle"
             ></div>
           </div>
         </div>
@@ -93,82 +108,303 @@
     </div>
   </div>
 </div>
+
 <script>
-  // Mock console logs for component interactions
-  
-  document.addEventListener('DOMContentLoaded', function() {
+
+import { filters } from "$/stores/filters"
+
+class FilterComponent {
+  constructor() {
+    this.minPrice = 0;
+    this.maxPrice = 199;
+    this.currentMinPrice = 0;
+    this.currentMaxPrice = 199;
+    this.isDragging = false;
+    this.activeHandle = null;
+    this.filters = {
+      availability: null,
+      minPrice: null,
+      maxPrice: null
+    };
     
-    const activeFilterTag = document.getElementById('activeFilterTag');
-    const inStockButton = document.getElementById('inStockButton');
-    const outOfStockButton = document.getElementById('outOfStockButton');
+    this.init();
+    this.loadFiltersFromURL();
+  }
+  
+  init() {
+    this.bindEvents();
+    this.updatePriceDisplay();
+  }
+  
+  bindEvents() {
+    // Availability toggle
+    document.getElementById('availabilityToggle').addEventListener('click', () => {
+      this.toggleSection('availability');
+    });
+    
+    // Price toggle
+    document.getElementById('priceToggle').addEventListener('click', () => {
+      this.toggleSection('price');
+    });
+    
+    // Availability filters
+    document.getElementById('inStockButton').addEventListener('click', () => {
+      this.handleAvailabilityFilter('true');
+    });
+    
+    document.getElementById('outOfStockButton').addEventListener('click', () => {
+      this.handleAvailabilityFilter('false');
+    });
+    
+    // Price slider events
+    const minHandle = document.getElementById('minHandle');
+    const maxHandle = document.getElementById('maxHandle');
+    
+    minHandle.addEventListener('mousedown', (e) => this.startDrag(e, 'min'));
+    maxHandle.addEventListener('mousedown', (e) => this.startDrag(e, 'max'));
+    
+    document.addEventListener('mousemove', (e) => this.drag(e));
+    document.addEventListener('mouseup', () => this.endDrag());
+    
+    // Filter tag removal
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('[data-filter]')) {
+        const filterType = e.target.closest('[data-filter]').dataset.filter;
+        this.removeFilter(filterType);
+      }
+    });
+  }
+  
+  toggleSection(section) {
+    const options = document.getElementById(`${section}Options`);
+    const arrow = document.getElementById(`${section}Arrow`);
+    
+    options.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180');
+  }
+  
+  handleAvailabilityFilter(value) {
     const inStockCheck = document.getElementById('inStockCheck');
     const outOfStockCheck = document.getElementById('outOfStockCheck');
     const inStockText = document.getElementById('inStockText');
     const outOfStockText = document.getElementById('outOfStockText');
     
-    // In stock button click
-    inStockButton.addEventListener('click', function() {
+    // Clear previous selections
+    inStockCheck.classList.add('hidden');
+    outOfStockCheck.classList.add('hidden');
+    inStockText.classList.remove('font-bold');
+    outOfStockText.classList.remove('font-bold');
+    
+    if (this.filters.availability === value) {
+      // Deselect if clicking the same filter
+      this.filters.availability = null;
+    } else {
+      // Select new filter
+      this.filters.availability = value;
       
-      // Toggle the black square
-      inStockCheck.classList.toggle('hidden');
-      
-      // Toggle bold font
-      if (!inStockCheck.classList.contains('hidden')) {
+      if (value === 'true') {
+        inStockCheck.classList.remove('hidden');
         inStockText.classList.add('font-bold');
       } else {
-        inStockText.classList.remove('font-bold');
-      }
-      
-      // Show/hide the active filter tag
-      if (!inStockCheck.classList.contains('hidden')) {
-        // Clear other selections
-        outOfStockCheck.classList.add('hidden');
-        outOfStockText.classList.remove('font-bold');
-        
-        activeFilterTag.classList.remove('hidden');
-        activeFilterTag.querySelector('span').textContent = 'IN STOCK';
-      } else {
-        activeFilterTag.classList.add('hidden');
-      }
-    });
-    
-    // Out of stock button click
-    outOfStockButton.addEventListener('click', function() {
-      
-      // Toggle the black square
-      outOfStockCheck.classList.toggle('hidden');
-      
-      // Toggle bold font
-      if (!outOfStockCheck.classList.contains('hidden')) {
+        outOfStockCheck.classList.remove('hidden');
         outOfStockText.classList.add('font-bold');
-      } else {
-        outOfStockText.classList.remove('font-bold');
       }
-      
-      // Show/hide the active filter tag
-      if (!outOfStockCheck.classList.contains('hidden')) {
-        // Clear other selections
-        inStockCheck.classList.add('hidden');
-        inStockText.classList.remove('font-bold');
-        
-        activeFilterTag.classList.remove('hidden');
-        activeFilterTag.querySelector('span').textContent = 'OUT OF STOCK';
-      } else {
-        activeFilterTag.classList.add('hidden');
-      }
-    });
+    }
     
-    // Remove filter tag click
-    activeFilterTag.querySelector('button').addEventListener('click', function() {
+    this.updateFilterTags();
+    this.updateURL();
+    this.updateStore();
+  }
+  
+  startDrag(e, handle) {
+    e.preventDefault();
+    this.isDragging = true;
+    this.activeHandle = handle;
+    document.body.style.userSelect = 'none';
+  }
+  
+  drag(e) {
+    if (!this.isDragging || !this.activeHandle) return;
+    
+    const slider = document.getElementById('priceSlider');
+    const rect = slider.getBoundingClientRect();
+    const percentage = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const value = Math.round(this.minPrice + (this.maxPrice - this.minPrice) * percentage);
+    
+    if (this.activeHandle === 'min') {
+      this.currentMinPrice = Math.min(value, this.currentMaxPrice - 1);
+    } else {
+      this.currentMaxPrice = Math.max(value, this.currentMinPrice + 1);
+    }
+    
+    this.updateSliderPosition();
+    this.updatePriceDisplay();
+  }
+  
+  endDrag() {
+    if (this.isDragging) {
+      this.isDragging = false;
+      this.activeHandle = null;
+      document.body.style.userSelect = '';
       
-      // Hide the tag
-      activeFilterTag.classList.add('hidden');
+      // Apply filter only on mouse drop
+      this.filters.minPrice = this.currentMinPrice > this.minPrice ? this.currentMinPrice : null;
+      this.filters.maxPrice = this.currentMaxPrice < this.maxPrice ? this.currentMaxPrice : null;
       
-      // Clear all selections and bold text
-      inStockCheck.classList.add('hidden');
-      outOfStockCheck.classList.add('hidden');
-      inStockText.classList.remove('font-bold');
-      outOfStockText.classList.remove('font-bold');
-    });
-  });
+      this.updateFilterTags();
+      this.updateURL();
+      this.updateStore();
+    }
+  }
+  
+  updateSliderPosition() {
+    const priceRange = document.getElementById('priceRange');
+    const minPercent = (this.currentMinPrice - this.minPrice) / (this.maxPrice - this.minPrice) * 100;
+    const maxPercent = (this.currentMaxPrice - this.minPrice) / (this.maxPrice - this.minPrice) * 100;
+    
+    priceRange.style.left = `${minPercent}%`;
+    priceRange.style.width = `${maxPercent - minPercent}%`;
+  }
+  
+  updatePriceDisplay() {
+    document.getElementById('minPriceDisplay').textContent = `$${this.currentMinPrice.toFixed(2)}`;
+    document.getElementById('maxPriceDisplay').textContent = `$${this.currentMaxPrice.toFixed(2)}`;
+  }
+  
+  updateFilterTags() {
+    const activeFilterTags = document.getElementById('activeFilterTags');
+    const availabilityTag = document.getElementById('availabilityTag');
+    const priceTag = document.getElementById('priceTag');
+    
+    let hasActiveFilters = false;
+    
+    // Availability tag
+    if (this.filters.availability !== null) {
+      const tagText = this.filters.availability === 'true' ? 'IN STOCK' : 'OUT OF STOCK';
+      availabilityTag.querySelector('span').textContent = tagText;
+      availabilityTag.classList.remove('hidden');
+      hasActiveFilters = true;
+    } else {
+      availabilityTag.classList.add('hidden');
+    }
+    
+    // Price tag
+    if (this.filters.minPrice !== null || this.filters.maxPrice !== null) {
+      const minText = this.filters.minPrice ? `$${this.filters.minPrice}` : '$0';
+      const maxText = this.filters.maxPrice ? `$${this.filters.maxPrice}` : '$199';
+      priceTag.querySelector('span').textContent = `${minText} - ${maxText}`;
+      priceTag.classList.remove('hidden');
+      hasActiveFilters = true;
+    } else {
+      priceTag.classList.add('hidden');
+    }
+    
+    // Show/hide container
+    if (hasActiveFilters) {
+      activeFilterTags.classList.remove('hidden');
+    } else {
+      activeFilterTags.classList.add('hidden');
+    }
+  }
+  
+  removeFilter(filterType) {
+    if (filterType === 'availability') {
+      this.filters.availability = null;
+      document.getElementById('inStockCheck').classList.add('hidden');
+      document.getElementById('outOfStockCheck').classList.add('hidden');
+      document.getElementById('inStockText').classList.remove('font-bold');
+      document.getElementById('outOfStockText').classList.remove('font-bold');
+    } else if (filterType === 'price') {
+      this.filters.minPrice = null;
+      this.filters.maxPrice = null;
+      this.currentMinPrice = this.minPrice;
+      this.currentMaxPrice = this.maxPrice;
+      this.updateSliderPosition();
+      this.updatePriceDisplay();
+    }
+    
+    this.updateFilterTags();
+    this.updateURL();
+    this.updateStore();
+  }
+  
+  updateURL() {
+    const url = new URL(window.location);
+    
+    // Clear existing filter params
+    url.searchParams.delete('availability');
+    url.searchParams.delete('minPrice');
+    url.searchParams.delete('maxPrice');
+    
+    // Add active filters
+    if (this.filters.availability !== null) {
+      url.searchParams.set('availability', this.filters.availability);
+    }
+    
+    if (this.filters.minPrice !== null) {
+      url.searchParams.set('minPrice', this.filters.minPrice.toString());
+    }
+    
+    if (this.filters.maxPrice !== null) {
+      url.searchParams.set('maxPrice', this.filters.maxPrice.toString());
+    }
+    
+    // Update URL without page reload
+    window.history.replaceState({}, '', url);
+  }
+  
+  updateStore() {
+    // Create a clean filter object with only non-null values
+    const activeFilters = {};
+    
+    if (this.filters.availability !== null) {
+      activeFilters.availability = this.filters.availability;
+    }
+    
+    if (this.filters.minPrice !== null) {
+      activeFilters.minPrice = this.filters.minPrice;
+    }
+    
+    if (this.filters.maxPrice !== null) {
+      activeFilters.maxPrice = this.filters.maxPrice;
+    }
+    
+    // Update the nanostores filters atom
+    filters.set(activeFilters);
+  }
+  
+  loadFiltersFromURL() {
+    const url = new URL(window.location);
+    
+    // Load availability filter
+    const availability = url.searchParams.get('availability');
+    if (availability === 'true' || availability === 'false') {
+      this.handleAvailabilityFilter(availability);
+    }
+    
+    // Load price filters
+    const minPrice = url.searchParams.get('minPrice');
+    const maxPrice = url.searchParams.get('maxPrice');
+    
+    if (minPrice && !isNaN(Number(minPrice))) {
+      this.currentMinPrice = Number(minPrice);
+      this.filters.minPrice = Number(minPrice);
+    }
+    
+    if (maxPrice && !isNaN(Number(maxPrice))) {
+      this.currentMaxPrice = Number(maxPrice);
+      this.filters.maxPrice = Number(maxPrice);
+    }
+    
+    this.updateSliderPosition();
+    this.updatePriceDisplay();
+    this.updateFilterTags();
+    this.updateStore();
+  }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new FilterComponent();
+});
 </script>
