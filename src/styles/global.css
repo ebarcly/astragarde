@@ -8,7 +8,7 @@
   /* Animation */
   --animate-shake: shake 0.5s infinite;
   /* Colour */
-
+  --color-beige: #f5f5dc;
   --color-mainbg: rgb(250 247 245);
 
   @keyframes shake {

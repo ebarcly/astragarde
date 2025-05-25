@@ -21,7 +21,13 @@ if (!product) {
   Astro.response.status = 404;
 }
 
-const firstVariant = product?.variants.nodes[0];
+// Get the selected variant from URL or default to first variant
+const url = new URL(Astro.request.url);
+const variantId = url.searchParams.get('variant');
+const selectedVariant = variantId 
+  ? product?.variants.nodes.find(v => v.id === variantId)
+  : product?.variants.nodes[0];
+
 setCache.short(Astro);
 ---
 
@@ -43,15 +49,17 @@ setCache.short(Astro);
           <div class="mt-8 lg:col-span-5 lg:mt-0">
             <ProductInformations
               title={product.title}
-              price={firstVariant?.price}
+              price={selectedVariant?.price}
+              product={product}
+              selectedVariant={selectedVariant}
             />
 
             <div>
               <AddToCartForm
                 client:load
-                variantId={firstVariant?.id}
-                variantQuantityAvailable={firstVariant?.quantityAvailable}
-                variantAvailableForSale={firstVariant?.availableForSale}
+                variantId={selectedVariant?.id}
+                variantQuantityAvailable={selectedVariant?.quantityAvailable}
+                variantAvailableForSale={selectedVariant?.availableForSale}
               />
             </div>
 

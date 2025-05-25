@@ -1,13 +1,76 @@
 ---
 import type { z } from "zod";
-import type { MoneyV2Result } from "../utils/schemas";
+import type { MoneyV2Result, ProductResult } from "../utils/schemas";
 import Money from "./Money.svelte";
 
 export interface Props {
   price?: z.infer<typeof MoneyV2Result>;
   title: string;
+  product: z.infer<typeof ProductResult>;
+  selectedVariant?: z.infer<typeof ProductResult>["variants"]["nodes"][0];
 }
-const { price, title } = Astro.props as Props;
+
+const { price, title, product, selectedVariant } = Astro.props as Props;
+
+// Get unique colors from variants
+const getColorVariants = () => {
+  if (!product?.variants.nodes) return [];
+  
+  const colors = new Map();
+  product.variants.nodes.forEach(variant => {
+    variant.selectedOptions?.forEach(option => {
+      if (option.name.toLowerCase() === 'color') {
+        colors.set(option.value, variant.id);
+      }
+    });
+  });
+  
+  return Array.from(colors.entries());
+};
+
+// Get unique sizes from variants
+const getSizeVariants = () => {
+  if (!product?.variants.nodes) return [];
+  
+  const sizes = new Map();
+  product.variants.nodes.forEach(variant => {
+    variant.selectedOptions?.forEach(option => {
+      if (option.name.toLowerCase() === 'size') {
+        sizes.set(option.value, variant.id);
+      }
+    });
+  });
+  
+  return Array.from(sizes.entries());
+};
+
+const colorVariants = getColorVariants();
+const sizeVariants = getSizeVariants();
+
+// Color mapping for swatches
+const getColorClass = (colorName: string) => {
+  const colorMap: { [key: string]: string } = {
+    'green': 'bg-green-500',
+    'yellow': 'bg-yellow-400',
+    'red': 'bg-red-500',
+    'blue': 'bg-blue-500',
+    'black': 'bg-black',
+    'white': 'bg-white border-gray-300',
+    'gray': 'bg-gray-400',
+    'grey': 'bg-gray-400',
+    'beige': 'bg-beige',
+    'brown': 'bg-brown',
+    'orange': 'bg-orange',
+    'pink': 'bg-pink',
+    'purple': 'bg-purple',
+  };
+  
+  const lowerColor = colorName.toLowerCase();
+  return colorMap[lowerColor] || 'bg-gray-300';
+};
+
+// Check if variant is low in stock (less than 5 items)
+const isLowStock = (quantity: number) => quantity <= 5 && quantity > 0;
 ---
 
 <h1 class="text-2xl font-bold text-zinc-800 sm:text-4xl">
@@ -16,6 +79,70 @@ const { price, title } = Astro.props as Props;
 <p class="mt-4 text-3xl font-bold text-emerald-900">
   <Money price={price} />
 </p>
+
+<!-- Color Selection -->
+{colorVariants.length > 0 && (
+  <div class="mt-6">
+    <h3 class="text-sm font-medium text-gray-900">Color</h3>
+    <div class="flex gap-2 mt-2">
+      {colorVariants.map(([color, variantId]) => (
+        <button
+          type="button"
+          class={`w-8 h-8 rounded-full border-2 transition-all ${getColorClass(color)} ${
+            selectedVariant?.id === variantId ? 'ring-2 ring-emerald-500' : 'hover:ring-2 hover:ring-gray-300'
+          }`}
+          title={color}
+          data-variant-id={variantId}
+          data-color={color}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+<!-- Size Selection -->
+{sizeVariants.length > 0 && (
+  <div class="mt-6">
+    <h3 class="text-sm font-medium text-gray-900">Size</h3>
+    <div class="grid grid-cols-4 gap-2 mt-2">
+      {sizeVariants.map(([size, variantId]) => (
+        <button
+          type="button"
+          class={`py-2 px-3 text-sm font-medium border rounded-md transition-all ${
+            selectedVariant?.id === variantId 
+              ? 'bg-emerald-900 text-white border-emerald-900' 
+              : 'border-gray-300 text-gray-900 hover:border-emerald-900'
+          }`}
+          data-variant-id={variantId}
+          data-size={size}
+        >
+          {size}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+
+<!-- Stock Information -->
+{selectedVariant && (
+  <div class="mt-6">
+    {selectedVariant.availableForSale ? (
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-900">
+          {isLowStock(selectedVariant.quantityAvailable) ? (
+            <span class="text-amber-600 font-medium">
+              Only {selectedVariant.quantityAvailable} left in stock
+            </span>
+          ) : (
+            <span class="text-emerald-600 font-medium">In stock</span>
+          )}
+        </span>
+      </div>
+    ) : (
+      <span class="text-sm text-red-600 font-medium">Out of stock</span>
+    )}
+  </div>
+)}
 
 <!-- Reviews -->
 <div class="mt-4">

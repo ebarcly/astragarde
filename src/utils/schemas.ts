@@ -60,15 +60,13 @@ export const VariantResult = z.object({
   availableForSale: z.boolean(),
   quantityAvailable: z.number().int(),
   price: MoneyV2Result,
-  compareAtPrice: MoneyV2Result.nullable().optional(),
-  selectedOptions: z
-    .array(
-      z.object({
-        name: z.string(),
-        value: z.string(),
-      })
-    )
-    .optional(),
+  compareAtPrice: MoneyV2Result.nullable(),
+  selectedOptions: z.array(
+    z.object({
+      name: z.string(),
+      value: z.string(),
+    })
+  ),
 });
 
 export const ProductResult = z

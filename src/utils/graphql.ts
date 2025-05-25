@@ -71,6 +71,14 @@ fragment productFragment on Product {
         amount
         currencyCode
       }
+      compareAtPrice {
+        amount
+        currencyCode
+      }
+      selectedOptions {
+        name
+        value
+      }
     }
   }
   featuredImage {
@@ -155,6 +163,21 @@ export const AddCartLinesMutation = `#graphql
 export const RemoveCartLinesMutation = `#graphql
   mutation ($cartId: ID!, $lineIds: [ID!]!) {
     cartLinesRemove (cartId: $cartId, lineIds: $lineIds) {
+      cart {
+        ...cartFragment
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+  ${CART_FRAGMENT}
+`;
+
+export const UpdateCartLinesMutation = `#graphql
+  mutation ($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+    cartLinesUpdate (cartId: $cartId, lines: $lines) {
       cart {
         ...cartFragment
       }

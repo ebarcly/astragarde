@@ -21,16 +21,16 @@ const isSoldOut = !product?.variants.nodes.some(variant => variant.availableForS
 const getColorVariants = () => {
   if (!product?.variants.nodes) return [];
   
-  const colors = new Set();
+  const colors = new Map();
   product.variants.nodes.forEach(variant => {
     variant.selectedOptions?.forEach(option => {
       if (option.name.toLowerCase() === 'color') {
-        colors.add(option.value);
+        colors.set(option.value, variant.id);
       }
     });
   });
   
-  return Array.from(colors);
+  return Array.from(colors.entries());
 };
 
 const colorVariants = getColorVariants();
@@ -46,19 +46,26 @@ const getColorClass = (colorName: string) => {
     'white': 'bg-white border-gray-300',
     'gray': 'bg-gray-400',
     'grey': 'bg-gray-400',
+    'beige': 'bg-beige',
+    'brown': 'bg-brown',
+    'orange': 'bg-orange',
+    'pink': 'bg-pink',
+    'purple': 'bg-purple',
   };
   
   const lowerColor = colorName.toLowerCase();
   return colorMap[lowerColor] || 'bg-gray-300';
-  
 };
 
-  const sizeClasses = {
-    medium: 'w-full h-auto aspect-[3/4] max-h-[340px] sm:max-h-[360px] md:max-h-[380px] lg:max-h-[400px]',
-    large: 'w-full h-auto aspect-[3/4] max-h-[340px] sm:max-h-[360px] md:max-h-[380px] lg:max-h-[400px]'
-  }
+const sizeClasses = {
+  medium: 'w-full h-auto aspect-[3/4] max-h-[340px] sm:max-h-[360px] md:max-h-[380px] lg:max-h-[400px]',
+  large: 'w-full h-auto aspect-[3/4] max-h-[340px] sm:max-h-[360px] md:max-h-[380px] lg:max-h-[400px]'
+}
 
-  const cardClasses = `relative ${sizeClasses[size]}`
+const cardClasses = `relative ${sizeClasses[size]}`
+
+// Get the second image if available
+const secondImage = product?.images.nodes[1] || product?.featuredImage;
 ---
 
 <a
@@ -68,10 +75,24 @@ const getColorClass = (colorName: string) => {
 <!-- card container -->
   <div class={cardClasses}>
     <!-- image container -->
-    <div class="w-full h-full bg-white flex items-center justify-center overflow-hidden">
-      <!-- image -->
+    <div class="w-full h-full flex items-center justify-center overflow-hidden relative">
+      <!-- hover image (background) -->
       <ShopifyImage
-        classList="w-full h-full object-cover object-center"
+        classList="w-full h-full object-cover object-center absolute inset-0"
+        loading="eager"
+        image={secondImage}
+        sizes={`
+          (min-width: 1540px) 348px,
+          (min-width: 1280px) 284px,
+          (min-width: 1040px) 309px,
+          (min-width: 780px) 348px,
+          (min-width: 640px) 284px,
+          calc(100vw - 48px)
+        `}
+      />
+      <!-- main image (foreground) -->
+      <ShopifyImage
+        classList="w-full h-full object-cover object-center absolute inset-0 transition-opacity duration-300 group-hover:opacity-0"
         loading="eager"
         image={product?.featuredImage}
         sizes={`
@@ -119,12 +140,14 @@ const getColorClass = (colorName: string) => {
       {product?.title}
     </h3>
     <!-- Color Swatches -->
-    {colorVariants.length > 0 && (
+    {colorVariants.length > 1 && (
       <div class="flex gap-1 justify-center mt-1">
-        {colorVariants.map((color) => (
-          <div 
-            class={`w-4 h-4 rounded-full border ${getColorClass(color as string)}`}
-            title={color as string}
+        {colorVariants.map(([color, variantId]) => (
+          <a 
+            href={`/products/${product?.handle}?variant=${variantId}`}
+            class={`w-4 h-4 rounded-full border ${getColorClass(color)} hover:ring-2 hover:ring-gray-300 transition-all`}
+            title={color}
+            data-variant-id={variantId}
           />
         ))}
       </div>
