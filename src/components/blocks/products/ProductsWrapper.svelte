@@ -7,7 +7,8 @@
   let { buyerIp } = $props<{ buyerIp: string }>();
 
   let products = $state([]);
-  let isLoading = $state(true); // loading state
+  let isLoading = $state(true);
+  let mounted = $state(false);
 
   async function fetchProducts(currentFilters: any, currentSort: SortOption) {
     isLoading = true;
@@ -35,16 +36,21 @@
   }
 
   onMount(() => {
+    mounted = true;
     fetchProducts(filters.value, sort.get());
   });
 
-  // Subscribe to both filters and sort changes
+  // Subscribe to both filters and sort changes, but only after mount
   filters.subscribe((val) => {
-    fetchProducts(val, sort.get());
+    if (mounted) {
+      fetchProducts(val, sort.get());
+    }
   });
 
   sort.subscribe((val) => {
-    fetchProducts(filters.value, val);
+    if (mounted) {
+      fetchProducts(filters.value, val);
+    }
   });
 </script>
 
