@@ -91,8 +91,8 @@ fragment productFragment on Product {
 `;
 
 export const ProductsQuery = `#graphql
-query ($first: Int! $query: String) {
-    products(first: $first, query: $query) {
+query ($first: Int!, $query: String, $sortKey: ProductSortKeys, $reverse: Boolean) {
+    products(first: $first, query: $query, sortKey: $sortKey, reverse: $reverse) {
       edges {
         node {
           ...productFragment

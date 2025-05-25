@@ -1,25 +1,34 @@
 ---
+import { sort } from "$/stores/sort";
+import type { SortOption } from "$/stores/sort";
+
 export interface Props {
-  options?: string[];
-  defaultValue?: string;
+  options?: Array<{
+    label: string;
+    value: SortOption;
+  }>;
+  defaultValue?: SortOption;
 }
 
 const { 
   options = [
-    "Featured",
-    "Best selling", 
-    "Alphabetically, A-Z",
-    "Alphabetically, Z-A",
-    "Price, low to high",
-    "Price, high to low",
-    "Date, old to new",
-    "Date, new to old"
+    { label: "Best selling", value: "best_selling" },
+    { label: "Alphabetically, A-Z", value: "alpha_asc" },
+    { label: "Alphabetically, Z-A", value: "alpha_desc" },
+    { label: "Price, low to high", value: "price_asc" },
+    { label: "Price, high to low", value: "price_desc" },
+    { label: "Date, old to new", value: "date_asc" },
+    { label: "Date, new to old", value: "date_desc" }
   ],
-  defaultValue = "Alphabetically, A-Z"
+  defaultValue = "best_selling"
 } = Astro.props;
 
 // Generate unique ID for this component instance
 const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
+
+// Get the current sort value from the store
+const currentSort = sort.get();
+const currentOption = options.find(opt => opt.value === currentSort) || options[0];
 ---
 
 <div class="relative inline-block w-72 self-end" data-dropdown={dropdownId}>
@@ -30,7 +39,7 @@ const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
     aria-haspopup="true"
     aria-expanded="false"
   >
-    <span class="current-selection text-gray-900">{defaultValue}</span>
+    <span class="current-selection text-gray-900">{currentOption.label}</span>
     <svg class="sorter-chevron w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
     </svg>
@@ -50,13 +59,13 @@ const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
           <button
             type="button"
             class={`sorter-option w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${
-              option === defaultValue 
+              option.value === currentSort 
                 ? 'bg-blue-600 text-white' 
                 : 'text-gray-900'
             }`}
-            data-value={option}
+            data-value={option.value}
           >
-            {option}
+            {option.label}
           </button>
         </li>
       ))}
@@ -65,44 +74,48 @@ const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
 </div>
 
 <script>
+  import { sort } from "$/stores/sort";
+  import type { SortOption } from "$/stores/sort";
+
   // Handle dropdown functionality
   document.addEventListener('DOMContentLoaded', function() {
     const dropdowns = document.querySelectorAll('[data-dropdown]');
     
     dropdowns.forEach(dropdown => {
-      const button = dropdown.querySelector('.sorter-button');
-      const menu = dropdown.querySelector('.sorter-dropdown');
-      const chevron = dropdown.querySelector('.sorter-chevron');
-      const currentSelection = dropdown.querySelector('.current-selection');
-      const options = dropdown.querySelectorAll('.sorter-option');
+      const button = dropdown.querySelector('.sorter-button') as HTMLButtonElement;
+      const menu = dropdown.querySelector('.sorter-dropdown') as HTMLDivElement;
+      const chevron = dropdown.querySelector('.sorter-chevron') as SVGElement;
+      const currentSelection = dropdown.querySelector('.current-selection') as HTMLSpanElement;
+      const options = dropdown.querySelectorAll('.sorter-option') as NodeListOf<HTMLButtonElement>;
       
       let isOpen = false;
       
       // Toggle dropdown
       function toggleDropdown() {
         isOpen = !isOpen;
-        menu.classList.toggle('hidden', !isOpen);
-        button.setAttribute('aria-expanded', isOpen.toString());
-        chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        menu?.classList.toggle('hidden', !isOpen);
+        button?.setAttribute('aria-expanded', isOpen.toString());
+        chevron?.style.setProperty('transform', isOpen ? 'rotate(180deg)' : 'rotate(0deg)');
       }
       
       // Close dropdown
       function closeDropdown() {
         if (isOpen) {
           isOpen = false;
-          menu.classList.add('hidden');
-          button.setAttribute('aria-expanded', 'false');
-          chevron.style.transform = 'rotate(0deg)';
+          menu?.classList.add('hidden');
+          button?.setAttribute('aria-expanded', 'false');
+          chevron?.style.setProperty('transform', 'rotate(0deg)');
         }
       }
       
       // Update selection
-      function updateSelection(newValue) {
-        currentSelection.textContent = newValue;
+      function updateSelection(newValue: SortOption) {
+        // Update the sort store
+        sort.set(newValue);
         
         // Update option styles
         options.forEach(option => {
-          const value = option.getAttribute('data-value');
+          const value = option.getAttribute('data-value') as SortOption;
           if (value === newValue) {
             option.classList.remove('text-gray-900');
             option.classList.add('bg-blue-600', 'text-white');
@@ -112,15 +125,34 @@ const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
           }
         });
         
-        // Dispatch custom event for parent components to listen to
-        dropdown.dispatchEvent(new CustomEvent('sorter-change', {
-          detail: { value: newValue },
-          bubbles: true
-        }));
+        // Update the current selection text
+        const selectedOption = Array.from(options).find(opt => opt.getAttribute('data-value') === newValue);
+        if (selectedOption && currentSelection) {
+          currentSelection.textContent = selectedOption.textContent;
+        }
+
+        // Update URL
+        updateURL(newValue);
+      }
+
+      // Update URL with sort parameter
+      function updateURL(sortValue: SortOption) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', sortValue);
+        window.history.replaceState({}, '', url);
+      }
+      
+      // Load initial sort value from URL
+      function loadSortFromURL() {
+        const url = new URL(window.location.href);
+        const sortValue = url.searchParams.get('sort') as SortOption | null;
+        if (sortValue) {
+          updateSelection(sortValue);
+        }
       }
       
       // Event listeners
-      button.addEventListener('click', (e) => {
+      button?.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleDropdown();
       });
@@ -128,29 +160,31 @@ const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
       options.forEach(option => {
         option.addEventListener('click', (e) => {
           e.stopPropagation();
-          const value = option.getAttribute('data-value');
-          updateSelection(value);
-          closeDropdown();
+          const value = option.getAttribute('data-value') as SortOption;
+          if (value) {
+            updateSelection(value);
+            closeDropdown();
+          }
         });
       });
       
       // Close on outside click
       document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target)) {
+        if (!dropdown.contains(e.target as Node)) {
           closeDropdown();
         }
       });
       
       // Close on escape key
-      document.addEventListener('keydown', (e) => {
+      document.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Escape' && isOpen) {
           closeDropdown();
-          button.focus();
+          button?.focus();
         }
       });
       
       // Keyboard navigation
-      button.addEventListener('keydown', (e) => {
+      button?.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           toggleDropdown();
@@ -164,13 +198,15 @@ const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
       });
       
       options.forEach((option, index) => {
-        option.addEventListener('keydown', (e) => {
+        option.addEventListener('keydown', (e: KeyboardEvent) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            const value = option.getAttribute('data-value');
-            updateSelection(value);
-            closeDropdown();
-            button.focus();
+            const value = option.getAttribute('data-value') as SortOption;
+            if (value) {
+              updateSelection(value);
+              closeDropdown();
+              button?.focus();
+            }
           } else if (e.key === 'ArrowDown') {
             e.preventDefault();
             const nextIndex = (index + 1) % options.length;
@@ -182,6 +218,9 @@ const dropdownId = `sorter-${Math.random().toString(36).substr(2, 9)}`;
           }
         });
       });
+
+      // Load initial sort value from URL
+      loadSortFromURL();
     });
   });
 </script>

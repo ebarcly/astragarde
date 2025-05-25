@@ -72,12 +72,19 @@ export const getProducts = async (options: {
   limit?: number;
   buyerIP: string;
   query?: string;
+  sortKey?: string;
+  reverse?: boolean;
 }) => {
-  const { limit = 10, buyerIP, query } = options;
+  const { limit = 10, buyerIP, query, sortKey, reverse } = options;
 
   const data = await makeShopifyRequest(
     ProductsQuery,
-    { first: limit , query },
+    { 
+      first: limit,
+      query,
+      sortKey: sortKey || undefined,
+      reverse: reverse || false
+    },
     buyerIP
   );
   const { products } = data;

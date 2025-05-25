@@ -110,10 +110,23 @@
 </div>
 
 <script>
+import { filters } from "$/stores/filters";
 
-import { filters } from "$/stores/filters"
+interface FilterState {
+  availability: string | null;
+  minPrice: number | null;
+  maxPrice: number | null;
+}
 
 class FilterComponent {
+  private minPrice: number;
+  private maxPrice: number;
+  private currentMinPrice: number;
+  private currentMaxPrice: number;
+  private isDragging: boolean;
+  private activeHandle: 'min' | 'max' | null;
+  private filters: FilterState;
+
   constructor() {
     this.minPrice = 0;
     this.maxPrice = 199;
@@ -131,69 +144,88 @@ class FilterComponent {
     this.loadFiltersFromURL();
   }
   
-  init() {
+  private init(): void {
     this.bindEvents();
     this.updatePriceDisplay();
   }
   
-  bindEvents() {
+  private bindEvents(): void {
     // Availability toggle
-    document.getElementById('availabilityToggle').addEventListener('click', () => {
-      this.toggleSection('availability');
-    });
+    const availabilityToggle = document.getElementById('availabilityToggle');
+    if (availabilityToggle) {
+      availabilityToggle.addEventListener('click', () => {
+        this.toggleSection('availability');
+      });
+    }
     
     // Price toggle
-    document.getElementById('priceToggle').addEventListener('click', () => {
-      this.toggleSection('price');
-    });
+    const priceToggle = document.getElementById('priceToggle');
+    if (priceToggle) {
+      priceToggle.addEventListener('click', () => {
+        this.toggleSection('price');
+      });
+    }
     
     // Availability filters
-    document.getElementById('inStockButton').addEventListener('click', () => {
-      this.handleAvailabilityFilter('true');
-    });
+    const inStockButton = document.getElementById('inStockButton');
+    if (inStockButton) {
+      inStockButton.addEventListener('click', () => {
+        this.handleAvailabilityFilter('true');
+      });
+    }
     
-    document.getElementById('outOfStockButton').addEventListener('click', () => {
-      this.handleAvailabilityFilter('false');
-    });
+    const outOfStockButton = document.getElementById('outOfStockButton');
+    if (outOfStockButton) {
+      outOfStockButton.addEventListener('click', () => {
+        this.handleAvailabilityFilter('false');
+      });
+    }
     
     // Price slider events
     const minHandle = document.getElementById('minHandle');
     const maxHandle = document.getElementById('maxHandle');
     
-    minHandle.addEventListener('mousedown', (e) => this.startDrag(e, 'min'));
-    maxHandle.addEventListener('mousedown', (e) => this.startDrag(e, 'max'));
+    if (minHandle) {
+      minHandle.addEventListener('mousedown', (e: MouseEvent) => this.startDrag(e, 'min'));
+    }
+    if (maxHandle) {
+      maxHandle.addEventListener('mousedown', (e: MouseEvent) => this.startDrag(e, 'max'));
+    }
     
-    document.addEventListener('mousemove', (e) => this.drag(e));
+    document.addEventListener('mousemove', (e: MouseEvent) => this.drag(e));
     document.addEventListener('mouseup', () => this.endDrag());
     
     // Filter tag removal
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('[data-filter]')) {
-        const filterType = e.target.closest('[data-filter]').dataset.filter;
-        this.removeFilter(filterType);
+    document.addEventListener('click', (e: MouseEvent) => {
+      const filterButton = (e.target as HTMLElement).closest('[data-filter]');
+      if (filterButton) {
+        const filterType = filterButton.getAttribute('data-filter');
+        if (filterType) {
+          this.removeFilter(filterType);
+        }
       }
     });
   }
   
-  toggleSection(section) {
+  private toggleSection(section: 'availability' | 'price'): void {
     const options = document.getElementById(`${section}Options`);
     const arrow = document.getElementById(`${section}Arrow`);
     
-    options.classList.toggle('hidden');
-    arrow.classList.toggle('rotate-180');
+    options?.classList.toggle('hidden');
+    arrow?.classList.toggle('rotate-180');
   }
   
-  handleAvailabilityFilter(value) {
+  private handleAvailabilityFilter(value: string): void {
     const inStockCheck = document.getElementById('inStockCheck');
     const outOfStockCheck = document.getElementById('outOfStockCheck');
     const inStockText = document.getElementById('inStockText');
     const outOfStockText = document.getElementById('outOfStockText');
     
     // Clear previous selections
-    inStockCheck.classList.add('hidden');
-    outOfStockCheck.classList.add('hidden');
-    inStockText.classList.remove('font-bold');
-    outOfStockText.classList.remove('font-bold');
+    inStockCheck?.classList.add('hidden');
+    outOfStockCheck?.classList.add('hidden');
+    inStockText?.classList.remove('font-bold');
+    outOfStockText?.classList.remove('font-bold');
     
     if (this.filters.availability === value) {
       // Deselect if clicking the same filter
@@ -203,11 +235,11 @@ class FilterComponent {
       this.filters.availability = value;
       
       if (value === 'true') {
-        inStockCheck.classList.remove('hidden');
-        inStockText.classList.add('font-bold');
+        inStockCheck?.classList.remove('hidden');
+        inStockText?.classList.add('font-bold');
       } else {
-        outOfStockCheck.classList.remove('hidden');
-        outOfStockText.classList.add('font-bold');
+        outOfStockCheck?.classList.remove('hidden');
+        outOfStockText?.classList.add('font-bold');
       }
     }
     
@@ -216,17 +248,19 @@ class FilterComponent {
     this.updateStore();
   }
   
-  startDrag(e, handle) {
+  private startDrag(e: MouseEvent, handle: 'min' | 'max'): void {
     e.preventDefault();
     this.isDragging = true;
     this.activeHandle = handle;
     document.body.style.userSelect = 'none';
   }
   
-  drag(e) {
+  private drag(e: MouseEvent): void {
     if (!this.isDragging || !this.activeHandle) return;
     
     const slider = document.getElementById('priceSlider');
+    if (!slider) return;
+
     const rect = slider.getBoundingClientRect();
     const percentage = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const value = Math.round(this.minPrice + (this.maxPrice - this.minPrice) * percentage);
@@ -241,7 +275,7 @@ class FilterComponent {
     this.updatePriceDisplay();
   }
   
-  endDrag() {
+  private endDrag(): void {
     if (this.isDragging) {
       this.isDragging = false;
       this.activeHandle = null;
@@ -257,8 +291,10 @@ class FilterComponent {
     }
   }
   
-  updateSliderPosition() {
+  private updateSliderPosition(): void {
     const priceRange = document.getElementById('priceRange');
+    if (!priceRange) return;
+
     const minPercent = (this.currentMinPrice - this.minPrice) / (this.maxPrice - this.minPrice) * 100;
     const maxPercent = (this.currentMaxPrice - this.minPrice) / (this.maxPrice - this.minPrice) * 100;
     
@@ -266,12 +302,19 @@ class FilterComponent {
     priceRange.style.width = `${maxPercent - minPercent}%`;
   }
   
-  updatePriceDisplay() {
-    document.getElementById('minPriceDisplay').textContent = `$${this.currentMinPrice.toFixed(2)}`;
-    document.getElementById('maxPriceDisplay').textContent = `$${this.currentMaxPrice.toFixed(2)}`;
+  private updatePriceDisplay(): void {
+    const minPriceDisplay = document.getElementById('minPriceDisplay');
+    const maxPriceDisplay = document.getElementById('maxPriceDisplay');
+    
+    if (minPriceDisplay) {
+      minPriceDisplay.textContent = `$${this.currentMinPrice.toFixed(2)}`;
+    }
+    if (maxPriceDisplay) {
+      maxPriceDisplay.textContent = `$${this.currentMaxPrice.toFixed(2)}`;
+    }
   }
   
-  updateFilterTags() {
+  private updateFilterTags(): void {
     const activeFilterTags = document.getElementById('activeFilterTags');
     const availabilityTag = document.getElementById('availabilityTag');
     const priceTag = document.getElementById('priceTag');
@@ -279,41 +322,54 @@ class FilterComponent {
     let hasActiveFilters = false;
     
     // Availability tag
-    if (this.filters.availability !== null) {
+    if (this.filters.availability !== null && availabilityTag) {
       const tagText = this.filters.availability === 'true' ? 'IN STOCK' : 'OUT OF STOCK';
-      availabilityTag.querySelector('span').textContent = tagText;
+      const span = availabilityTag.querySelector('span');
+      if (span) {
+        span.textContent = tagText;
+      }
       availabilityTag.classList.remove('hidden');
       hasActiveFilters = true;
-    } else {
+    } else if (availabilityTag) {
       availabilityTag.classList.add('hidden');
     }
     
     // Price tag
-    if (this.filters.minPrice !== null || this.filters.maxPrice !== null) {
+    if ((this.filters.minPrice !== null || this.filters.maxPrice !== null) && priceTag) {
       const minText = this.filters.minPrice ? `$${this.filters.minPrice}` : '$0';
       const maxText = this.filters.maxPrice ? `$${this.filters.maxPrice}` : '$199';
-      priceTag.querySelector('span').textContent = `${minText} - ${maxText}`;
+      const span = priceTag.querySelector('span');
+      if (span) {
+        span.textContent = `${minText} - ${maxText}`;
+      }
       priceTag.classList.remove('hidden');
       hasActiveFilters = true;
-    } else {
+    } else if (priceTag) {
       priceTag.classList.add('hidden');
     }
     
     // Show/hide container
-    if (hasActiveFilters) {
-      activeFilterTags.classList.remove('hidden');
-    } else {
-      activeFilterTags.classList.add('hidden');
+    if (activeFilterTags) {
+      if (hasActiveFilters) {
+        activeFilterTags.classList.remove('hidden');
+      } else {
+        activeFilterTags.classList.add('hidden');
+      }
     }
   }
   
-  removeFilter(filterType) {
+  private removeFilter(filterType: string): void {
     if (filterType === 'availability') {
       this.filters.availability = null;
-      document.getElementById('inStockCheck').classList.add('hidden');
-      document.getElementById('outOfStockCheck').classList.add('hidden');
-      document.getElementById('inStockText').classList.remove('font-bold');
-      document.getElementById('outOfStockText').classList.remove('font-bold');
+      const inStockCheck = document.getElementById('inStockCheck');
+      const outOfStockCheck = document.getElementById('outOfStockCheck');
+      const inStockText = document.getElementById('inStockText');
+      const outOfStockText = document.getElementById('outOfStockText');
+      
+      inStockCheck?.classList.add('hidden');
+      outOfStockCheck?.classList.add('hidden');
+      inStockText?.classList.remove('font-bold');
+      outOfStockText?.classList.remove('font-bold');
     } else if (filterType === 'price') {
       this.filters.minPrice = null;
       this.filters.maxPrice = null;
@@ -328,8 +384,8 @@ class FilterComponent {
     this.updateStore();
   }
   
-  updateURL() {
-    const url = new URL(window.location);
+  private updateURL(): void {
+    const url = new URL(window.location.href);
     
     // Clear existing filter params
     url.searchParams.delete('availability');
@@ -353,9 +409,9 @@ class FilterComponent {
     window.history.replaceState({}, '', url);
   }
   
-  updateStore() {
+  private updateStore(): void {
     // Create a clean filter object with only non-null values
-    const activeFilters = {};
+    const activeFilters: Record<string, string | number> = {};
     
     if (this.filters.availability !== null) {
       activeFilters.availability = this.filters.availability;
@@ -373,8 +429,8 @@ class FilterComponent {
     filters.set(activeFilters);
   }
   
-  loadFiltersFromURL() {
-    const url = new URL(window.location);
+  private loadFiltersFromURL(): void {
+    const url = new URL(window.location.href);
     
     // Load availability filter
     const availability = url.searchParams.get('availability');

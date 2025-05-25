@@ -6,6 +6,8 @@ export async function GET({ request }: { request: Request }) {
   const isAvailable = url.searchParams.get("availability")?.toLowerCase();
   const priceMin = url.searchParams.get("minPrice");
   const priceMax = url.searchParams.get("maxPrice");
+  const sortKey = url.searchParams.get("sortKey");
+  const reverse = url.searchParams.get("reverse") === "true";
 
   const buyerIP =
     url.searchParams.get("buyerIP") ||
@@ -43,6 +45,8 @@ export async function GET({ request }: { request: Request }) {
     limit: 10,
     buyerIP,
     query: query || undefined, // Pass undefined if no query to avoid empty string
+    sortKey: sortKey || undefined,
+    reverse: reverse
   });
 
   return new Response(JSON.stringify(products), {
