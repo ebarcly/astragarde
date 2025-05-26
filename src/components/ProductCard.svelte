@@ -63,6 +63,7 @@ const getColorClass = (colorName: string) => {
 };
 
 const sizeClasses = {
+  small: "w-36 h-52 sm:w-40 sm:h-56 md:w-44 sm:h-60 lg:w-48 lg:h-64",
   medium: "w-44 h-64 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-68 lg:h-96",
   large: "w-52 h-76 sm:w-60 sm:h-84 md:w-72 md:h-96 lg:w-80 lg:h-[500px]",
   extraLarge: "w-60 h-80 sm:w-72 sm:h-96 md:w-80 md:h-[600px] lg:w-[20vw] lg:h-[700px]",

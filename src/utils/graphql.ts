@@ -52,6 +52,7 @@ const PRODUCT_FRAGMENT = `#graphql
 fragment productFragment on Product {
   id
   title
+  description
   handle
   images (first: 10) {
     nodes {

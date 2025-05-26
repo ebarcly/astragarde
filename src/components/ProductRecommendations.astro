@@ -22,10 +22,10 @@ const productRecommendations = await getProductRecommendations({
           Other styles
         </h2>
 
-        <div class="mt-6 grid grid-cols-1 gap-y-10 gap-x-2 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-4">
+        <div class="mt-6 grid grid-cols-2 gap-y-10 gap-x-2 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-4">
           {productRecommendations.map((product) => (
             <div>
-            <ProductCard product={product} size="large" />
+            <ProductCard product={product} size="small" />
             </div>
           ))}
         </div>

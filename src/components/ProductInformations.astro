@@ -15,134 +15,164 @@ const { price, title, product, selectedVariant } = Astro.props as Props;
 // Get unique colors from variants
 const getColorVariants = () => {
   if (!product?.variants.nodes) return [];
-  
+
   const colors = new Map();
-  product.variants.nodes.forEach(variant => {
-    variant.selectedOptions?.forEach(option => {
-      if (option.name.toLowerCase() === 'color') {
+  product.variants.nodes.forEach((variant) => {
+    variant.selectedOptions?.forEach((option) => {
+      if (option.name.toLowerCase() === "color") {
         colors.set(option.value, variant.id);
       }
     });
   });
-  
+
   return Array.from(colors.entries());
 };
 
 // Get unique sizes from variants
 const getSizeVariants = () => {
   if (!product?.variants.nodes) return [];
-  
+
   const sizes = new Map();
-  product.variants.nodes.forEach(variant => {
-    variant.selectedOptions?.forEach(option => {
-      if (option.name.toLowerCase() === 'size') {
+  product.variants.nodes.forEach((variant) => {
+    variant.selectedOptions?.forEach((option) => {
+      if (option.name.toLowerCase() === "size") {
         sizes.set(option.value, variant.id);
       }
     });
   });
-  
+
   return Array.from(sizes.entries());
+};
+
+// Get the selected color name
+const getSelectedColorName = () => {
+  if (!selectedVariant?.selectedOptions) return null;
+
+  const colorOption = selectedVariant.selectedOptions.find(
+    (option) => option.name.toLowerCase() === "color"
+  );
+
+  return colorOption?.value || null;
 };
 
 const colorVariants = getColorVariants();
 const sizeVariants = getSizeVariants();
+const selectedColorName = getSelectedColorName();
 
 // Color mapping for swatches
 const getColorClass = (colorName: string) => {
   const colorMap: { [key: string]: string } = {
-    'green': 'bg-green-500',
-    'yellow': 'bg-yellow-400',
-    'red': 'bg-red-500',
-    'blue': 'bg-blue-500',
-    'black': 'bg-black',
-    'white': 'bg-white border-gray-300',
-    'gray': 'bg-gray-400',
-    'grey': 'bg-gray-400',
-    'beige': 'bg-beige',
-    'brown': 'bg-brown',
-    'orange': 'bg-orange',
-    'pink': 'bg-pink',
-    'purple': 'bg-purple',
+    green: "bg-green-500",
+    yellow: "bg-yellow-400",
+    red: "bg-red-500",
+    blue: "bg-blue-500",
+    black: "bg-black",
+    white: "bg-white border-gray-300",
+    gray: "bg-gray-400",
+    grey: "bg-gray-400",
+    beige: "bg-beige",
+    brown: "bg-brown",
+    orange: "bg-orange",
+    pink: "bg-pink",
+    purple: "bg-purple",
   };
-  
+
   const lowerColor = colorName.toLowerCase();
-  return colorMap[lowerColor] || 'bg-gray-300';
+  return colorMap[lowerColor] || "bg-gray-300";
 };
 
 // Check if variant is low in stock (less than 5 items)
 const isLowStock = (quantity: number) => quantity <= 5 && quantity > 0;
 ---
 
-<h1 class="text-2xl font-bold text-zinc-800 sm:text-4xl">
+<h1
+  class="font-primary mx-4 lg:mx-0 text-center lg:text-start text-4xl font-bold uppercase sm:text-4xl"
+>
   {title}
 </h1>
-<p class="mt-4 text-3xl font-bold text-emerald-900">
+<p class="font-primary mt-4 text-center lg:text-start text-2xl font-bold text-zinc-700">
   <Money price={price} />
 </p>
 
-<!-- Color Selection -->
-{colorVariants.length > 0 && (
-  <div class="mt-6">
-    <h3 class="text-sm font-medium text-gray-900">Color</h3>
-    <div class="flex gap-2 mt-2">
-      {colorVariants.map(([color, variantId]) => (
-        <button
-          type="button"
-          class={`w-8 h-8 rounded-full border-2 transition-all ${getColorClass(color)} ${
-            selectedVariant?.id === variantId ? 'ring-2 ring-emerald-500' : 'hover:ring-2 hover:ring-gray-300'
-          }`}
-          title={color}
-          data-variant-id={variantId}
-          data-color={color}
-        />
-      ))}
-    </div>
-  </div>
-)}
-
 <!-- Size Selection -->
-{sizeVariants.length > 0 && (
-  <div class="mt-6">
-    <h3 class="text-sm font-medium text-gray-900">Size</h3>
-    <div class="grid grid-cols-4 gap-2 mt-2">
-      {sizeVariants.map(([size, variantId]) => (
-        <button
-          type="button"
-          class={`py-2 px-3 text-sm font-medium border rounded-md transition-all ${
-            selectedVariant?.id === variantId 
-              ? 'bg-emerald-900 text-white border-emerald-900' 
-              : 'border-gray-300 text-gray-900 hover:border-emerald-900'
-          }`}
-          data-variant-id={variantId}
-          data-size={size}
-        >
-          {size}
-        </button>
-      ))}
+{
+  sizeVariants.length > 0 && (
+    <div class="mt-6">
+      <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
+        Size
+      </h3>
+      <div class="mx-10 lg:mx-0 mt-2 grid grid-cols-4 gap-2">
+        {sizeVariants.map(([size, variantId]) => (
+          <button
+            type="button"
+            class={`px-3 py-2 text-sm font-medium transition-all ${
+              selectedVariant?.id === variantId
+                ? "border-2 border-black"
+                : "text-gray-900"
+            }`}
+            data-variant-id={variantId}
+            data-size={size}
+          >
+            {size}
+          </button>
+        ))}
+      </div>
     </div>
-  </div>
-)}
+  )
+}
+
+<!-- Color Selection -->
+{
+  colorVariants.length > 0 && (
+    <div class="mt-6">
+      <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
+        Color {selectedColorName && `— ${selectedColorName}`}
+      </h3>
+      <div class="mt-2 flex justify-center lg:justify-start gap-2">
+        {colorVariants.map(([color, variantId]) => (
+          <button
+            type="button"
+            class={`h-8 w-8 rounded-full transition-all ${getColorClass(color)} ${
+              selectedVariant?.id === variantId
+                ? "ring-2 ring-black ring-offset-4"
+                : "hover:ring-2 hover:ring-gray-300"
+            }`}
+            title={color}
+            data-variant-id={variantId}
+            data-color={color}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 <!-- Stock Information -->
-{selectedVariant && (
-  <div class="mt-6">
-    {selectedVariant.availableForSale ? (
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-900">
-          {isLowStock(selectedVariant.quantityAvailable) ? (
-            <span class="text-amber-600 font-medium">
-              Only {selectedVariant.quantityAvailable} left in stock
-            </span>
-          ) : (
-            <span class="text-emerald-600 font-medium">In stock</span>
-          )}
-        </span>
-      </div>
-    ) : (
-      <span class="text-sm text-red-600 font-medium">Out of stock</span>
-    )}
-  </div>
-)}
+{
+  selectedVariant && (
+    <div class="mt-6">
+      {selectedVariant.availableForSale ? (
+        <div class="flex items-center gap-2">
+          <span class="w-full text-center lg:text-start text-sm text-gray-900">
+            {isLowStock(selectedVariant.quantityAvailable) ? (
+              <span class="flex justify-center lg:justify-start lg:mx-2 items-center gap-2 font-medium">
+                <span class="relative inline-flex size-3">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span class="relative inline-flex size-3 rounded-full bg-amber-400" />
+                </span>
+                Low stock - {selectedVariant.quantityAvailable} left
+              </span>
+            ) : (
+              <span class="font-medium text-emerald-600">In stock</span>
+            )}
+          </span>
+        </div>
+      ) : (
+        <span class="text-sm font-medium text-red-600">Out of stock</span>
+      )}
+    </div>
+  )
+}
 
 <!-- Reviews -->
 <!-- <div class="mt-4">
