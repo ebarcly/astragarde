@@ -74,7 +74,7 @@ const cardClasses = `relative ${sizeClasses[size]}`;
 const secondImage = product?.images.nodes[1] || product?.featuredImage;
 </script>
 
-<a href="/products/{product?.handle}" class="group block overflow-hidden">
+<div class="group block overflow-hidden">
   <!-- card container -->
   <div class={cardClasses}>
     <!-- image container -->
@@ -117,7 +117,7 @@ const secondImage = product?.images.nodes[1] || product?.featuredImage;
     {/if}
 
     {#if isSoldOut}
-      <div class="absolute top-2 left-2 bg-gray-500 px-2 py-1 text-xs font-medium text-white">
+      <div class="absolute top-2 left-2 bg-zinc-500 px-2 py-1 text-xs font-medium text-white">
         Sold Out
       </div>
     {/if}
@@ -125,10 +125,10 @@ const secondImage = product?.images.nodes[1] || product?.featuredImage;
 
   <div class="flex flex-col items-center justify-between py-2 text-center text-zinc-700">
     <!-- Price Section -->
-    <div class="font-primary mb-1 text-lg font-semibold text-black">
+    <div class="font-secondary mb-1 text-sm font-light text-black">
       {#if isOnSale}
         <div class="flex items-center justify-center gap-2">
-          <span class="text-sm text-gray-500 line-through">
+          <span class="text-sm text-zinc-500 line-through">
             <Money showCurrency price={product?.variants.nodes[0].compareAtPrice!} />
           </span>
           <span class="text-black">
@@ -140,8 +140,11 @@ const secondImage = product?.images.nodes[1] || product?.featuredImage;
       {/if}
     </div>
     
-    <h3 class="font-primary mb-0.5 w-full text-base font-bold break-words">
-      {product?.title}
+    <!-- Product Title -->
+    <h3 class="font-secondary mb-0.5 w-full text-base font-semibold text-zinc-900">
+      <a href="/products/{product?.handle}">
+        {product?.title}
+      </a>
     </h3>
     
     <!-- Color Swatches -->
@@ -153,9 +156,10 @@ const secondImage = product?.images.nodes[1] || product?.featuredImage;
             class="h-4 w-4 rounded-full border {getColorClass(color)} transition-all hover:ring-2 hover:ring-gray-300"
             title={color}
             data-variant-id={variantId}
+            aria-label={`Select color ${color}`}
           ></a>
         {/each}
       </div>
     {/if}
   </div>
-</a>
+</div>

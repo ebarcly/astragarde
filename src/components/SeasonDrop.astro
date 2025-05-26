@@ -1,6 +1,7 @@
 ---
 import Products from './Products.svelte';
 
+
 import mockupProducts from '$/utils/mockup.ts';
 
 // Props interface for CMS integration
@@ -18,9 +19,8 @@ export interface Props {
 
 // Default values (can be overridden by CMS)
 const {
-  title = "SUMMER DROP",
-  subtitle = "Official Drop",
-  linkText = "Official Drop",
+  title = "Summer Drop",
+  linkText = "Be the first to know",
   linkUrl = "#",
   buttonText = "SHOP COLLECTION",
   buttonUrl = "#",
@@ -30,151 +30,113 @@ const {
 ---
 
 <!-- Season Drop -->
-<section class="section-padding-x! data-countdown-section py-20 sm:px-20">
-  <div id="countdownSection" class="mx-auto">
-    <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-3">
-      <!-- Left Section - Title and Link -->
-      <div class="px-10 lg:col-span-1">
-        <h1 class="mb-4 text-5xl font-bold text-black">
+<section class="section-padding-x! py-12 sm:py-16">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+      <!-- Left: Title and Link -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left gap-4">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-secondary font-bold text-black uppercase">
           {title}
         </h1>
         <a
           href={linkUrl}
-          class="inline-flex items-center font-medium text-black hover:underline"
+          class="inline-flex items-center font-secondary font-light text-black hover:underline text-base sm:text-lg"
         >
           {linkText}
-          <svg
-            class="ml-2 h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"></path>
+          <svg class="ml-2 h-4 w-4 md:h-6 md:w-6 font-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </a>
       </div>
 
-      <!-- Center Section - Countdown Timer -->
-      <div class="lg:col-span-1">
-        <div class="flex w-full justify-center text-center gap-4">
-          <!-- Days -->
-          <div class="flex flex-col items-center border-r border-black pr-4">
-            <span
-              id="countdown-days"
-              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
-            >
-            <span
-              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
-              >DAYS</span
-            >
-          </div>
-
-          <!-- Hours -->
-          <div class="flex flex-col items-center border-r border-black pr-4">
-            <span
-              id="countdown-hours"
-              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
-            >
-            <span
-              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
-              >HOURS</span
-            >
-          </div>
-
-          <!-- Minutes -->
-          <div class="flex flex-col items-center border-r border-black pr-4">
-            <span
-              id="countdown-minutes"
-              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
-            >
-            <span
-              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
-              >MINUTES</span
-            >
-          </div>
-
-          <!-- Seconds -->
-          <div class="flex flex-col items-center">
-            <span
-              id="countdown-seconds"
-              class="text-4xl font-bold text-black lg:text-5xl tracking-wider">0</span
-            >
-            <span
-              class="mt-1 text-xs font-medium tracking-wider text-gray-600 uppercase lg:text-sm"
-              >SECONDS</span
-            >
-          </div>
+      <!-- Center: Countdown -->
+      <div class="flex justify-center">
+        <div class="flex gap-4 sm:gap-6">
+          {['days', 'hours', 'minutes', 'seconds'].map((unit, idx) => (
+            <div class={`flex flex-col items-center ${idx < 3 ? 'border-r border-black pr-4 sm:pr-6' : ''}`}>
+              <span id={`countdown-${unit}`} class="text-3xl sm:text-4xl md:text-5xl font-bold text-black tracking-wider">0</span>
+              <span class="mt-1 text-xs sm:text-sm font-medium tracking-wider text-gray-600 uppercase">{unit.toUpperCase()}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <!-- Right Section - Shop Button -->
-      <div class="flex justify-center lg:col-span-1 lg:justify-end">
+      <!-- Right: Shop Button -->
+      <div class="flex justify-center md:justify-end">
         <a
           href={buttonUrl}
-          class="inline-flex items-center justify-center bg-black text-white px-4 py-2 rounded-sm"
+          class="inline-block bg-zinc-900 hover:bg-zinc-700 text-white font-secondary py-3 px-8 rounded-lg text-base md:text-lg transition shadow-lg uppercase tracking-wider"
         >
           {buttonText}
         </a>
       </div>
     </div>
   </div>
-
-  <!-- products -->
-  <div id="seasonProducts" class="mt-16 mb-16">
-    <Products products={products.slice(0, 8)} layout="horizontal" />
-  </div>
-
-  <!-- paragraph -->
-  <div class="section-padding-x!">
-    <p class="text-center lg:text-2xl text-zinc-800 font-primary font-medium tracking-wider mb-16">
-      Trendy tracksuits and sunglasses designed for the fearless fashionista.
-    </p>
-  </div>
-
-  <!-- Video hero -->
-  <div class="relative h-[600px] bg-black md:rounded-lg text-center" data-video-hero>
-    <video src="https://cdn.shopify.com/videos/c/o/v/ca1684baee104031893a6ca94b5e59d4.mp4" class="w-full h-full object-cover" autoplay muted loop playsinline webkit-playsinline></video>
-    <div class="absolute inset-0 bg-black opacity-50"></div>
-    <div class="flex justify-center flex-col h-full absolute bottom-0 left-0 right-0 p-4 z-10">
-      <h2 class="text-white text-4xl font-bold font-primary uppercase tracking-wider text-center mb-4">
-        Redefining the ordinary
-      </h2>
-      <p class="text-white text-sm font-primary font-medium tracking-wider text-center text-balance mb-4">
-        We revolutionize urban style with our fearless approach to fashion, crafting tracksuits, clothes, and sunglasses that empower self-expression.
-      </p>
-    </div>
-  </div>
-
-  <!-- horizontal scrolling text -->
-  <div class="scrolling-text" style="--move-speed: 20s;">
-    <div class="scrolling-text__inner">
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-      <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
-    </div>
-  </div>
-
-  <!-- products -->
-  <div id="seasonProducts" class="mt-16 mb-16">
-    <Products products={products.slice(0, 3)} layout="horizontal" cardSize='extraLarge' />
-  </div>
-
-  <!-- 2 column grid -->
-  <div class="flex flex-col lg:flex-row">
-    <div class="w-full lg:w-1/2"></div>
-  </div>
 </section>
+
+<!-- products -->
+<div id="seasonProducts" class="section-padding-x! mt-16 mb-16">
+  <Products products={products.slice(0, 8)} layout="horizontal" />
+</div>
+
+<!-- paragraph -->
+<div class="section-padding-x!">
+  <p class="text-center lg:text-4xl md:text-2xl sm:text-xl font-tertiary text-zinc-800 font-medium tracking-wider mb-16">
+    Trendy tracksuits and sunglasses designed for the fearless fashionista.
+  </p>
+</div>
+
+<!-- Video hero -->
+<div class="section-padding-x! relative w-full aspect-[16/9] md:rounded-lg overflow-hidden flex items-center justify-center bg-black min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[500px]" data-video-hero>
+  <video
+    src="https://cdn.shopify.com/videos/c/o/v/ca1684baee104031893a6ca94b5e59d4.mp4"
+    class="absolute inset-0 w-full h-full object-cover"
+    autoplay
+    muted
+    loop
+    playsinline
+    poster="/fallback-video-poster.jpg"
+  ></video>
+  <!-- Stronger gradient overlay for readability -->
+  <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/90"></div>
+  <div class="relative z-10 flex flex-col items-center justify-center h-full w-full px-4 py-8 text-center">
+    <h2 class="text-white text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold font-primary uppercase tracking-wider mb-3 drop-shadow-lg">
+      Redefine Your Everyday
+    </h2>
+    <p class="text-white text-base xs:text-lg sm:text-xl md:text-2xl font-secondary font-light tracking-wider text-center mb-6 drop-shadow-lg max-w-2xl">
+      Fearless fashion for the modern world.
+    </p>
+    <a href="/collections/all" class="inline-block bg-zinc-900 hover:bg-zinc-700 text-white font-secondary py-3 px-8 rounded-lg text-base md:text-lg transition shadow-lg uppercase tracking-wider">
+      Shop Now
+    </a>
+  </div>
+</div>
+
+<!-- horizontal scrolling text -->
+<div class="scrolling-text" style="--move-speed: 20s;">
+  <div class="scrolling-text__inner text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-primary font-bold uppercase tracking-widest">
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+    <span>Fashion that ignites your confidence.&nbsp;&nbsp;&nbsp;</span>
+  </div>
+</div>
+
+<!-- products -->
+<div id="seasonProducts" class="section-padding-x! mt-16 mb-16">
+  <Products products={products.slice(0, 8)} layout="horizontal" />
+</div>
+
+<!-- 2 column grid -->
+<div class="flex flex-col lg:flex-row">
+  <div class="w-full lg:w-1/2"></div>
+</div>
 
 <script define:vars={{ endDate }}>
   class CountdownTimer {

@@ -12,11 +12,11 @@ interface Props {
   cardSize?: "medium" | "large" | 'extraLarge';
 }
 
-let { products, gap = 4, layout = "grid", cardSize }: Props = $props();
+let { products, gap = 2, layout = "grid", cardSize }: Props = $props();
 </script>
 
 <section>
-  <div class="container py-16 sm:py-20">
+  <div class="flex flex-col gap-4 py-16 sm:py-20">
     <h2 class="sr-only">Products</h2>
     {#if layout === "horizontal"}
       <div

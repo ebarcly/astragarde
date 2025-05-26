@@ -1,16 +1,15 @@
 import { defineConfig } from "astro/config";
 import vercel from "@astrojs/vercel";
+// import node from "@astrojs/node";
 import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 import svelte from "@astrojs/svelte";
 
-import node from "@astrojs/node";
-
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  adapter: node({
+  adapter: vercel({
     mode: "standalone",
   }),
 
