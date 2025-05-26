@@ -29,7 +29,7 @@ const navLinks = [
 <div id={overlayId} class="fixed inset-0 z-60 hidden bg-white/30"></div>
 <div
   id={sidebarId}
-  class="fixed z-70 flex h-full w-[350px] -translate-x-full flex-col bg-white p-4 transition-all duration-300"
+  class="fixed z-70 flex h-full w-[300px] md:w-[420px] -translate-x-full flex-col bg-white p-4 transition-all duration-300"
 >
   <div class="flex w-full justify-end">
     <button
@@ -54,11 +54,11 @@ const navLinks = [
     </button>
   </div>
   <nav class="mt-6 space-y-1 overflow-y-auto px-2">
-    <ul class="font-primary space-y-4 font-bold uppercase">
+    <ul class="font-secondary space-y-4 font-black uppercase tracking-wider">
       {
         navLinks.map((link) => (
           <li>
-            <a href={link.href} class="text-gray-900 hover:text-gray-600">
+            <a href={link.href} class="text-zinc-900 hover:text-zinc-600">
               {link.text}
             </a>
           </li>
