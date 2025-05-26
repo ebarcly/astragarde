@@ -4,6 +4,7 @@ import LogoWhite from "$/components/LogoWhite.astro";
 import CartIcon from "$/components/CartIcon.svelte";
 import SearchIcon from "$/svgs/SearchIcon.astro";
 import Hamburger from "$/svgs/Hamburger.astro";
+import PredictiveSearch from "$/components/PredictiveSearch.svelte"
 
 export interface Props {
   variant?: "absolute" | "relative";
@@ -22,6 +23,8 @@ const mainHeaderId = `${id}-mainHeader`;
 const scrolledHeaderId = `${id}-scrolledHeader`;
 const openSidebarId = `${id}-openSidebar`;
 const openSidebarScrolledId = `${id}-openSidebarScrolled`;
+const searchTriggerId = `${id}-search-trigger`;
+const searchTriggerScrolledId = `${id}-search-trigger-scrolled`;
 
 // Determine classes based on variant
 const getMainHeaderClasses = () => {
@@ -69,7 +72,7 @@ const useWhiteIcons = variant === "absolute";
 
     <!-- Icons (cart, search) -->
     <div class="flex justify-end gap-2 sm:gap-4">
-      <button class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
+      <button id={searchTriggerId} class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
         <SearchIcon color={useWhiteIcons ? "white" : undefined} />
       </button>
       <CartIcon color={useWhiteIcons ? "white" : "black"} client:load />
@@ -97,7 +100,7 @@ const useWhiteIcons = variant === "absolute";
           </a>
         </div>
         <div class="flex justify-end gap-2 sm:gap-4">
-          <button class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
+          <button id={searchTriggerScrolledId} class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
             <SearchIcon />
           </button>
           <CartIcon color="black" client:load />
@@ -107,7 +110,7 @@ const useWhiteIcons = variant === "absolute";
   )
 }
 
-<script define:vars={{ scrolledHeaderId, enableScrollAnimation }}>
+<script define:vars={{ scrolledHeaderId, enableScrollAnimation, searchTriggerId, searchTriggerScrolledId }}>
   if (enableScrollAnimation) {
     const scrolledHeader = document.getElementById(scrolledHeaderId);
 
@@ -131,4 +134,18 @@ const useWhiteIcons = variant === "absolute";
       window.removeEventListener("scroll", handleScroll);
     });
   }
+
+   document.addEventListener('DOMContentLoaded', () => {
+    // Handle both search buttons
+    const searchButtons = [
+      document.getElementById(searchTriggerId),
+      document.getElementById(searchTriggerScrolledId)
+    ].filter(Boolean); // Remove null elements
+    
+    searchButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent('open-search'));
+      });
+    });
+  });
 </script>

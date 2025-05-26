@@ -2,7 +2,7 @@
 // src/pages/search.astro
 import { getProducts } from '$/utils/shopify';
 import Layout from '$/layouts/BaseLayout.astro';
-import PredictiveSearch from '../components/PredictiveSearch.svelte';
+import SearchBar from '../components/SearchBar.svelte';
 import Products from '../components/Products.svelte';
 
 const url = new URL(Astro.request.url);
@@ -42,13 +42,17 @@ const title = query ? `Search results for "${query}"` : 'Search';
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Search Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-4">
+      <h1 class="text-3xl font-bold text-gray-900 mb-6">
         {query ? `Search results for "${query}"` : 'Search Products'}
       </h1>
       
-      <!-- Search Input -->
-      <div class="max-w-2xl">
-        <PredictiveSearch client:load placeholder="Search products..." />
+      <!-- Search Bar -->
+      <div class="w-full flex justify-center mb-6">
+        <SearchBar 
+          client:load 
+          placeholder="Search products..." 
+          initialQuery={query}
+        />
       </div>
     </div>
 
