@@ -12,52 +12,36 @@ export interface Props {
 
 const { price, title, product, selectedVariant } = Astro.props as Props;
 
-// Get unique colors from variants
-const getColorVariants = () => {
+// Get unique variants grouped by option type
+const getVariantsByOption = (optionName: string) => {
   if (!product?.variants.nodes) return [];
-
-  const colors = new Map();
+  const variants = new Map();
+  
   product.variants.nodes.forEach((variant) => {
-    variant.selectedOptions?.forEach((option) => {
-      if (option.name.toLowerCase() === "color") {
-        colors.set(option.value, variant.id);
-      }
-    });
+    const option = variant.selectedOptions?.find(
+      (opt) => opt.name.toLowerCase() === optionName.toLowerCase()
+    );
+    if (option) {
+      variants.set(option.value, variant.id);
+    }
   });
-
-  return Array.from(colors.entries());
+  
+  return Array.from(variants.entries());
 };
 
-// Get unique sizes from variants
-const getSizeVariants = () => {
-  if (!product?.variants.nodes) return [];
-
-  const sizes = new Map();
-  product.variants.nodes.forEach((variant) => {
-    variant.selectedOptions?.forEach((option) => {
-      if (option.name.toLowerCase() === "size") {
-        sizes.set(option.value, variant.id);
-      }
-    });
-  });
-
-  return Array.from(sizes.entries());
-};
-
-// Get the selected color name
-const getSelectedColorName = () => {
+// Get selected option value
+const getSelectedOption = (optionName: string) => {
   if (!selectedVariant?.selectedOptions) return null;
-
-  const colorOption = selectedVariant.selectedOptions.find(
-    (option: any) => option.name.toLowerCase() === "color"
+  const option = selectedVariant.selectedOptions.find(
+    (opt) => opt.name.toLowerCase() === optionName.toLowerCase()
   );
-
-  return colorOption?.value || null;
+  return option?.value || null;
 };
 
-const colorVariants = getColorVariants();
-const sizeVariants = getSizeVariants();
-const selectedColorName = getSelectedColorName();
+const colorVariants = getVariantsByOption('color');
+const sizeVariants = getVariantsByOption('size');
+const selectedColor = getSelectedOption('color');
+const selectedSize = getSelectedOption('size');
 
 // Color mapping for swatches
 const getColorClass = (colorName: string) => {
@@ -71,23 +55,19 @@ const getColorClass = (colorName: string) => {
     gray: "bg-gray-400",
     grey: "bg-gray-400",
     beige: "bg-beige",
-    brown: "bg-brown",
-    orange: "bg-orange",
-    pink: "bg-pink",
-    purple: "bg-purple",
+    brown: "bg-amber-800",
+    orange: "bg-orange-500",
+    pink: "bg-pink-500",
+    purple: "bg-purple-500",
   };
-
-  const lowerColor = colorName.toLowerCase();
-  return colorMap[lowerColor] || "bg-gray-300";
+  return colorMap[colorName.toLowerCase()] || "bg-gray-300";
 };
 
-// Check if variant is low in stock (less than 5 items)
+// Check if variant is low in stock
 const isLowStock = (quantity: number) => quantity <= 5 && quantity > 0;
 ---
 
-<h1
-  class="font-primary mx-4 lg:mx-0 text-center lg:text-start text-4xl font-bold uppercase sm:text-4xl"
->
+<h1 class="font-primary mx-4 lg:mx-0 text-center lg:text-start text-4xl font-bold uppercase sm:text-4xl">
   {title}
 </h1>
 <p class="font-primary mt-4 text-center lg:text-start text-2xl font-bold text-zinc-700">
@@ -95,153 +75,93 @@ const isLowStock = (quantity: number) => quantity <= 5 && quantity > 0;
 </p>
 
 <!-- Size Selection -->
-{
-  sizeVariants.length > 0 && (
-    <div class="mt-6">
-      <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
-        Size
-      </h3>
-      <div class="mx-10 lg:mx-0 mt-2 grid grid-cols-4 gap-2">
-        {sizeVariants.map(([size, variantId]) => (
-          <button
-            type="button"
-            class={`px-3 py-2 text-sm font-medium transition-all ${
-              selectedVariant?.id === variantId
-                ? "border-2 border-black"
-                : "text-gray-900"
-            }`}
-            data-variant-id={variantId}
-            data-size={size}
-          >
-            {size}
-          </button>
-        ))}
-      </div>
+{sizeVariants.length > 0 && (
+  <div class="mt-6">
+    <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
+      Size
+    </h3>
+    <div class="mx-10 lg:mx-0 mt-2 grid grid-cols-4 gap-2">
+      {sizeVariants.map(([size, variantId]) => (
+        <button
+          type="button"
+          class={`px-3 py-2 text-sm font-medium transition-all cursor-pointer hover:bg-gray-100 ${
+            selectedSize === size
+              ? "border-2 border-black"
+              : "text-gray-900 border border-gray-300"
+          }`}
+          data-variant-id={variantId}
+          data-size={size}
+        >
+          {size}
+        </button>
+      ))}
     </div>
-  )
-}
+  </div>
+)}
 
 <!-- Color Selection -->
-{
-  colorVariants.length > 0 && (
-    <div class="mt-6">
-      <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
-        Color {selectedColorName && `— ${selectedColorName}`}
-      </h3>
-      <div class="mt-2 flex justify-center lg:justify-start gap-2">
-        {colorVariants.map(([color, variantId]) => (
-          <button
-            type="button"
-            class={`h-8 w-8 rounded-full transition-all ${getColorClass(color)} ${
-              selectedVariant?.id === variantId
-                ? "ring-2 ring-black ring-offset-4"
-                : "hover:ring-2 hover:ring-gray-300"
-            }`}
-            title={color}
-            data-variant-id={variantId}
-            data-color={color}
-          />
-        ))}
-      </div>
+{colorVariants.length > 0 && (
+  <div class="mt-6">
+    <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
+      Color {selectedColor && `— ${selectedColor}`}
+    </h3>
+    <div class="mt-2 flex justify-center lg:justify-start gap-2">
+      {colorVariants.map(([color, variantId]) => (
+        <button
+          type="button"
+          class={`h-8 w-8 rounded-full transition-all cursor-pointer ${getColorClass(color)} ${
+            selectedColor === color
+              ? "ring-2 ring-black ring-offset-4"
+              : "hover:ring-2 hover:ring-gray-300"
+          }`}
+          title={color}
+          data-variant-id={variantId}
+          data-color={color}
+        />
+      ))}
     </div>
-  )
-}
+  </div>
+)}
 
 <!-- Stock Information -->
-{
-  selectedVariant && (
-    <div class="mt-6">
-      {selectedVariant.availableForSale ? (
-        <div class="flex items-center gap-2">
-          <span class="w-full text-center lg:text-start text-sm text-gray-900">
-            {isLowStock(selectedVariant.quantityAvailable) ? (
-              <span class="flex justify-center lg:justify-start lg:mx-2 items-center gap-2 font-medium">
-                <span class="relative inline-flex size-3">
-                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                  <span class="relative inline-flex size-3 rounded-full bg-amber-400" />
-                </span>
-                Low stock - {selectedVariant.quantityAvailable} left
-              </span>
-            ) : (
-              <span class="font-medium text-emerald-600">In stock</span>
-            )}
-          </span>
-        </div>
-      ) : (
-        <span class="text-sm font-medium text-red-600">Out of stock</span>
-      )}
-    </div>
-  )
-}
-
-<!-- Reviews -->
-<!-- <div class="mt-4">
-  <div class="flex items-center gap-4">
-    <div class="flex">
-      <svg
-        class="h-5 w-5 text-yellow-400"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-        ></path>
-      </svg>
-      <svg
-        class="h-5 w-5 text-yellow-400"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-        ></path>
-      </svg>
-      <svg
-        class="h-5 w-5 text-yellow-400"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-        ></path>
-      </svg>
-      <svg
-        class="h-5 w-5 text-yellow-400"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-        ></path>
-      </svg>
-      <svg
-        class="h-5 w-5 text-gray-200"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-        ></path>
-      </svg>
-    </div>
-    <a href="#reviews" class="text-sm text-emerald-900 hover:underline"
-      >42 Reviews</a
-    >
-  </div>
+{selectedVariant && (
   <div class="mt-6">
-    <p class="text-base text-zinc-900">
-      This store is for demo purposes only. No orders will be fulfilled. Please
-      visit the brand's <a
-        class="text-emerald-900 underline"
-        href="https://www.lateafternoons.ca"
-        target="_blank"
-        rel="noopener noreferer">website</a
-      > to purchase this product.
-    </p>
+    {selectedVariant.availableForSale ? (
+      <div class="flex items-center gap-2">
+        <span class="w-full text-center lg:text-start text-sm text-gray-900">
+          {isLowStock(selectedVariant.quantityAvailable) ? (
+            <span class="flex justify-center lg:justify-start lg:mx-2 items-center gap-2 font-medium">
+              <span class="relative inline-flex size-3">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                <span class="relative inline-flex size-3 rounded-full bg-amber-400" />
+              </span>
+              Low stock - {selectedVariant.quantityAvailable} left
+            </span>
+          ) : (
+            <span class="font-medium text-emerald-600">In stock</span>
+          )}
+        </span>
+      </div>
+    ) : (
+      <span class="text-sm font-medium text-red-600">Out of stock</span>
+    )}
   </div>
-</div> -->
+)}
+
+<script>
+  // Add event listeners for variant selection
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle variant selection (both size and color)
+    const variantButtons = document.querySelectorAll('[data-variant-id]');
+    variantButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const variantId = this.getAttribute('data-variant-id');
+        if (variantId) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('variant', variantId);
+          window.location.href = url.toString();
+        }
+      });
+    });
+  });
+</script>
