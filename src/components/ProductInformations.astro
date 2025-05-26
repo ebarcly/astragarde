@@ -49,7 +49,7 @@ const getSelectedColorName = () => {
   if (!selectedVariant?.selectedOptions) return null;
 
   const colorOption = selectedVariant.selectedOptions.find(
-    (option) => option.name.toLowerCase() === "color"
+    (option: any) => option.name.toLowerCase() === "color"
   );
 
   return colorOption?.value || null;
