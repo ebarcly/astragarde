@@ -13,54 +13,58 @@ export interface Props {
 const { images } = Astro.props as Props;
 ---
 
-<div class="grid gap-4 md:grid-cols-8 lg:gap-6">
-  <div class="md:order-2 md:col-span-6">
-    <ShopifyImage
-      classList="overflow-hidden rounded-lg h-full object-cover"
-      loading="eager"
-      image={images.nodes[0]}
-      sizes={`
-          (min-width: 1540px) 475px,
-          (min-width: 1280px) 389px,
-          (min-width: 1040px) 304px,
-          (min-width: 780px) 720px,
-          (min-width: 680px) 592px,
-          calc(94.44vw - 31px)
-        `}
-    />
+<div class="grid gap-4 lg:grid-cols-8 lg:gap-6">
+  <!-- Mobile Image Slider -->
+  <div class="block lg:hidden overflow-x-auto whitespace-nowrap space-x-2">
+    {images.nodes.map((image, index) => (
+      <div class="inline-block w-[80vw] overflow-hidden">
+        <ShopifyImage
+          classList="object-cover h-full"
+          loading="eager"
+          image={image}
+          sizes="90vw"
+        />
+      </div>
+    ))}
   </div>
-  <div
-    class:list={[
-      "grid",
-      "grid-cols-4",
-      "gap-4",
-      "md:order-1",
-      "md:col-span-2",
-      "md:flex",
-      "md:flex-col",
-      "md:gap-6",
-      { "md:justify-between": images.nodes.length > 2 },
-    ]}
-  >
-    {
-      images.nodes.map((image, index) => {
-        if (index < 3) {
-          return (
-            <div class="overflow-hidden rounded-lg">
-              <ShopifyImage
-                classList=""
-                loading="eager"
-                image={image}
-                sizes={`
-                  (min-width: 1540px) 475px,
-                  (min-width: 1280px) 389px,
+
+  <!-- Thumbnails on Desktop (Left Column) -->
+  <div class="hidden lg:flex lg:flex-col lg:gap-6 lg:col-span-2">
+    {images.nodes.map((image, index) => {
+      if (index < 3) {
+        return (
+          <div class="overflow-hidden aspect-square">
+            <ShopifyImage
+              classList="object-cover w-full h-full"
+              loading="eager"
+              image={image}
+              sizes={`
+                  (min-width: 1540px) 190px,
+                  (min-width: 1280px) 156px,
+                  (min-width: 1024px) 120px,
                   304px
                 `}
-              />
-            </div>
-          );
-        }
-      })
-    }
+            />
+          </div>
+        );
+      }
+    })}
+  </div>
+
+  <!-- Main Image on Desktop (Right Column) -->
+  <div class="hidden lg:block lg:col-span-6">
+    <div class="overflow-hidden">
+      <ShopifyImage
+        classList="object-cover w-full h-full"
+        loading="eager"
+        image={images.nodes[0]}
+        sizes={`
+            (min-width: 1540px) 570px,
+            (min-width: 1280px) 468px,
+            (min-width: 1024px) 360px,
+            calc(75vw - 24px)
+          `}
+      />
+    </div>
   </div>
 </div>
