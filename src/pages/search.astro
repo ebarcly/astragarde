@@ -1,0 +1,132 @@
+---
+// src/pages/search.astro
+import { getProducts } from '$/utils/shopify';
+import Layout from '$/layouts/BaseLayout.astro';
+import SearchBar from '../components/SearchBar.svelte';
+import Products from '../components/Products.svelte';
+
+const url = new URL(Astro.request.url);
+const query = url.searchParams.get('q') || '';
+const page = parseInt(url.searchParams.get('page') || '1');
+const limit = 20; // Products per page
+
+let products = [];
+let totalProducts = 0;
+let error = null;
+
+if (query) {
+  try {
+    const buyerIP = Astro.clientAddress || '127.0.0.1';
+    
+    // Get products for current page
+    products = await getProducts({
+      limit,
+      buyerIP,
+      query,
+      sortKey: 'RELEVANCE'
+    });
+    
+    // Note: Shopify doesn't provide total count in a single query
+    // You might need to make additional queries or implement pagination differently
+    totalProducts = products.length;
+  } catch (e) {
+    error = e instanceof Error ? e.message : 'An error occurred';
+    console.error('Search page error:', e);
+  }
+}
+
+const title = query ? `Search results for "${query}"` : 'Search';
+---
+
+<Layout title={title} navigation={{variant: 'relative', enableScrollAnimation: true}}>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Search Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-6">
+        {query ? `Search results for "${query}"` : 'Search Products'}
+      </h1>
+      
+      <!-- Search Bar -->
+      <div class="w-full flex justify-center mb-6">
+        <SearchBar 
+          client:load 
+          placeholder="Search products..." 
+          initialQuery={query}
+        />
+      </div>
+    </div>
+
+    {error && (
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div class="flex">
+          <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Error</h3>
+            <p class="text-sm text-red-700 mt-1">{error}</p>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {query && !error && (
+      <div class="mb-6">
+        <p class="text-sm text-gray-600">
+          {products.length > 0 
+            ? `Showing ${products.length} result${products.length !== 1 ? 's' : ''}`
+            : 'No products found'
+          }
+        </p>
+      </div>
+    )}
+
+    <!-- Search Results -->
+    {products.length > 0 && (
+      <Products products={products} gap={6} layout="grid" />
+    )}
+
+    <!-- Empty State -->
+    {query && !error && products.length === 0 && (
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No products found</h3>
+        <p class="mt-2 text-sm text-gray-500">
+          Try adjusting your search terms or browse our categories
+        </p>
+        <div class="mt-6">
+          <a 
+            href="/"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Browse all products
+          </a>
+        </div>
+      </div>
+    )}
+
+    <!-- No Query State -->
+    {!query && !error && (
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">Search our products</h3>
+        <p class="mt-2 text-sm text-gray-500">
+          Enter a search term above to find products
+        </p>
+      </div>
+    )}
+  </main>
+</Layout>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
