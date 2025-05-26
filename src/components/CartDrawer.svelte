@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { fade, fly } from "svelte/transition";
   import {
@@ -16,9 +16,9 @@
   let cartDrawerEl: HTMLDivElement | undefined = $state();
 
   // Add classes to cart line items if cart is updating
-  let cartIsUpdatingClass = $derived($isCartUpdating
-    ? "opacity-50 pointer-events-none"
-    : "");
+  let cartIsUpdatingClass = $derived(
+    $isCartUpdating ? "opacity-50 pointer-events-none" : "",
+  );
 
   // Add focus to cart drawer when it opens
   run(() => {
@@ -46,25 +46,33 @@
   function updateQuantity(id: string, newQuantity: number) {
     if (newQuantity > 0) {
       updateCartItemQuantity(id, newQuantity);
+    } else {
+      removeItem(id);
     }
   }
 
   // Get selected options (size and color) from the variant title
   function getSelectedOptions(title: string) {
-    const options = title.split(' / ');
+    const options = title.split(" / ");
     const result: { size?: string; color?: string } = {};
-    
-    options.forEach(option => {
-      if (option.toLowerCase().includes('size')) {
-        result.size = option.split(': ')[1];
-      } else if (option.toLowerCase().includes('color')) {
-        result.color = option.split(': ')[1];
+
+    options.forEach((option, index) => {
+      const lower = option.toLowerCase();
+
+      if (lower.includes("size:")) {
+        result.size = option.split(": ")[1];
+      } else if (lower.includes("color:")) {
+        result.color = option.split(": ")[1];
       } else {
-        // If no prefix, assume it's a color
-        result.color = option;
+        // No prefix: assume position-based
+        if (index === 0) {
+          result.size = option;
+        } else if (index === 1) {
+          result.color = option;
+        }
       }
     });
-    
+
     return result;
   }
 </script>
@@ -85,6 +93,7 @@
     <div class="fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
         <div
+          role="dialog"
           class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-6 focus:outline-none"
           tabindex="-1"
           use:clickOutside={() => closeCartDrawer()}
@@ -153,7 +162,7 @@
                 </div>
               </div>
 
-              <div class="flex-1 overflow-y-scroll">
+              <div class="flex-1 overflow-y-auto">
                 <div class="px-5">
                   {#if $cart && $cart.lines?.nodes.length > 0}
                     <!-- svelte-ignore a11y_no_redundant_roles -->
@@ -162,14 +171,16 @@
                       class="divide-y divide-zinc-100 {cartIsUpdatingClass}"
                     >
                       {#each $cart.lines?.nodes as item}
-                        {@const selectedOptions = getSelectedOptions(item.merchandise.title)}
+                        {@const selectedOptions = getSelectedOptions(
+                          item.merchandise.title,
+                        )}
                         <li class="grid py-8 grid-cols-12 gap-3">
                           <div
-                            class="overflow-hidden rounded-lg col-span-3 lg:col-span-2"
+                            class="overflow-hidden col-span-4 lg:col-span-3"
                           >
                             <ShopifyImage
                               image={item.merchandise.image}
-                              classList="object-cover h-full object-center aspect-1"
+                              classList="object-cover h-full object-center"
                               sizes="(min-width: 100px) 100px"
                               loading="lazy"
                             />
@@ -184,28 +195,39 @@
                               {item.merchandise.product.title}
                             </a>
                             {#if selectedOptions.size}
-                              <p class="text-sm text-gray-500">Size: {selectedOptions.size}</p>
+                              <p class="text-sm text-gray-500">
+                                Size: {selectedOptions.size}
+                              </p>
                             {/if}
                             {#if selectedOptions.color}
-                              <p class="text-sm text-gray-500">Color: {selectedOptions.color}</p>
+                              <p class="text-sm text-gray-500">
+                                Color: {selectedOptions.color}
+                              </p>
                             {/if}
                             <p class="text-xs">
-                              <Money price={item.cost.amountPerQuantity} showCurrency={false} />
+                              <Money
+                                price={item.cost.amountPerQuantity}
+                                showCurrency={false}
+                              />
                             </p>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center">
                               <button
                                 type="button"
-                                class="w-8 h-8 flex items-center justify-center border rounded-md hover:bg-gray-100"
-                                onclick={() => updateQuantity(item.id, item.quantity - 1)}
+                                class="cursor-pointer w-8 h-6 flex items-center justify-center hover:bg-black hover:text-white transition-all"
+                                onclick={() =>
+                                  updateQuantity(item.id, item.quantity - 1)}
                                 disabled={$isCartUpdating}
                               >
                                 -
                               </button>
-                              <span class="w-8 text-center">{item.quantity}</span>
+                              <span class="w-8 text-center"
+                                >{item.quantity}</span
+                              >
                               <button
                                 type="button"
-                                class="w-8 h-8 flex items-center justify-center border rounded-md hover:bg-gray-100"
-                                onclick={() => updateQuantity(item.id, item.quantity + 1)}
+                                class="cursor-pointer w-8 h-6 flex items-center justify-center hover:bg-black hover:text-white transition-all"
+                                onclick={() =>
+                                  updateQuantity(item.id, item.quantity + 1)}
                                 disabled={$isCartUpdating}
                               >
                                 +
@@ -213,42 +235,23 @@
                             </div>
                           </div>
                           <div
-                            class="col-span-2 items-end flex justify-between flex-col"
+                            class="col-span-2 lg:col-span-1 flex items-center justify-end"
                           >
-                            <button
-                              onclick={() => {
-                                removeItem(item.id);
-                              }}
-                              type="button"
-                              disabled={$isCartUpdating}
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                                class="w-5 h-5"
-                              >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                                />
-                              </svg>
-                            </button>
-                            <div>
-                              <p class="font-medium">
-                                <Money price={item.cost.totalAmount} showCurrency={false} />
-                              </p>
-                            </div>
+                            <p class="font-medium">
+                              <Money
+                                price={item.cost.totalAmount}
+                                showCurrency={false}
+                              />
+                            </p>
                           </div>
                         </li>
                       {/each}
                     </ul>
                   {:else}
                     <div class="mt-4">
-                      <p class="text-black font-primary">Your cart is currently empty.</p>
+                      <p class="text-black font-primary">
+                        Your cart is currently empty.
+                      </p>
                     </div>
                   {/if}
                 </div>
@@ -269,7 +272,7 @@
                       </p>
                     </div>
                     <p class="mt-0.5 text-sm text-gray-500">
-                      Shipping and taxes calculated at checkout.
+                      Shipping, taxes, and discount codes calculated at checkout.
                     </p>
                     <div class="mt-6">
                       <a href={$cart.checkoutUrl} class="button">Checkout</a>
