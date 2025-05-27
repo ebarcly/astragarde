@@ -65,17 +65,19 @@ const useWhiteIcons = variant === "absolute";
 
     <!-- Logo (responsive size) -->
     <div class="flex justify-center">
-      <a href="/" class="cursor-pointer flex items-center max-h-8 sm:max-h-10 lg:max-h-12">
+      <a href="/" class="flex items-center max-h-8 sm:max-h-10 lg:max-h-12">
         {useWhiteIcons ? <LogoWhite /> : <Logo />}
       </a>
     </div>
 
     <!-- Icons (cart, search) -->
     <div class="flex justify-end gap-2 sm:gap-4">
-      <button id={searchTriggerId} class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
+      <button id={searchTriggerId} class="cursor-pointer p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
         <SearchIcon color={useWhiteIcons ? "white" : undefined} />
       </button>
+      <div class="flex items-center">
       <CartIcon color={useWhiteIcons ? "white" : "black"} client:load />
+      </div>
     </div>
   </nav>
 </div>
@@ -95,15 +97,17 @@ const useWhiteIcons = variant === "absolute";
           </button>
         </div>
         <div class="flex justify-center">
-          <a href="/" class="cursor-pointer flex items-center max-h-8">
+          <a href="/" class="cursor-pointer flex items-center max-h-8 sm:max-h-10 lg:max-h-12">
             <Logo />
           </a>
         </div>
         <div class="flex justify-end gap-2 sm:gap-4">
-          <button id={searchTriggerScrolledId} class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
+          <button id={searchTriggerScrolledId} class="cursor-pointer p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
             <SearchIcon />
           </button>
+          <div class="flex items-center">
           <CartIcon color="black" client:load />
+          </div>
         </div>
       </nav>
     </div>

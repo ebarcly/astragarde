@@ -174,6 +174,27 @@ const { images } = Astro.props as Props;
   #lightbox-container::-webkit-scrollbar {
     display: none;
   }
+
+  /* Swipe navigation indicator */
+  .swipe-indicator {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 8px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .swipe-indicator.show {
+    opacity: 1;
+  }
 </style>
 
 <script define:vars={{ images: images.nodes }}>
@@ -198,6 +219,17 @@ const { images } = Astro.props as Props;
       this.initialTouchDistance = 0;
       this.initialScale = 1;
       this.touches = [];
+      
+      // Swipe navigation
+      this.swipeStartX = 0;
+      this.swipeStartY = 0;
+      this.swipeEndX = 0;
+      this.swipeEndY = 0;
+      this.minSwipeDistance = 50;
+      this.maxVerticalSwipe = 100;
+      this.isSwipingHorizontally = false;
+      this.swipeStartTime = 0;
+      this.maxSwipeTime = 300; // Maximum time for a swipe gesture
       
       // Elements
       this.modal = document.getElementById('lightbox-modal');
@@ -486,23 +518,30 @@ const { images } = Astro.props as Props;
       this.setScale(this.scale + delta, e.clientX, e.clientY);
     }
     
-    // Touch event handlers
+    // Touch event handlers with swipe navigation
     handleTouchStart(e) {
       e.preventDefault();
       this.touches = Array.from(e.touches);
       
       if (this.touches.length === 1) {
+        const touch = this.touches[0];
+        this.swipeStartX = touch.clientX;
+        this.swipeStartY = touch.clientY;
+        this.swipeStartTime = Date.now();
+        this.isSwipingHorizontally = null;
+        
         // Single touch - start pan if zoomed
         if (this.scale > 1) {
           this.isDragging = true;
-          this.dragStartX = this.touches[0].clientX;
-          this.dragStartY = this.touches[0].clientY;
+          this.dragStartX = touch.clientX;
+          this.dragStartY = touch.clientY;
           this.dragStartPanX = this.panX;
           this.dragStartPanY = this.panY;
         }
       } else if (this.touches.length === 2) {
         // Two finger pinch - start zoom
         this.isDragging = false;
+        this.isSwipingHorizontally = false; // Disable swipe during pinch
         this.initialTouchDistance = this.getTouchDistance();
         this.initialScale = this.scale;
       }
@@ -512,12 +551,28 @@ const { images } = Astro.props as Props;
       e.preventDefault();
       this.touches = Array.from(e.touches);
       
-      if (this.touches.length === 1 && this.isDragging && this.scale > 1) {
-        // Single touch pan
-        this.panX = this.dragStartPanX + (this.touches[0].clientX - this.dragStartX);
-        this.panY = this.dragStartPanY + (this.touches[0].clientY - this.dragStartY);
-        this.constrainPan();
-        this.updateTransform();
+      if (this.touches.length === 1) {
+        const touch = this.touches[0];
+        const deltaX = touch.clientX - this.swipeStartX;
+        const deltaY = touch.clientY - this.swipeStartY;
+        
+        // Determine swipe direction on first significant movement
+        if (this.isSwipingHorizontally === null && (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10)) {
+          this.isSwipingHorizontally = Math.abs(deltaX) > Math.abs(deltaY);
+        }
+        
+        if (this.scale > 1 && this.isDragging) {
+          // Pan when zoomed in
+          this.panX = this.dragStartPanX + deltaX;
+          this.panY = this.dragStartPanY + deltaY;
+          this.constrainPan();
+          this.updateTransform();
+        } else if (this.scale === 1 && this.isSwipingHorizontally) {
+          // Allow horizontal swipe for navigation when not zoomed
+          // Optional: Add visual feedback for swipe (you can uncomment below)
+          // this.container.style.transform = `translateX(${deltaX * 0.3}px)`;
+        }
+        
       } else if (this.touches.length === 2) {
         // Pinch zoom
         const currentDistance = this.getTouchDistance();
@@ -537,17 +592,59 @@ const { images } = Astro.props as Props;
       this.touches = Array.from(e.touches);
       
       if (this.touches.length === 0) {
+        // Check for swipe navigation
+        if (this.scale === 1 && this.isSwipingHorizontally) {
+          const touch = e.changedTouches[0];
+          this.swipeEndX = touch.clientX;
+          this.swipeEndY = touch.clientY;
+          const swipeTime = Date.now() - this.swipeStartTime;
+          
+          this.handleSwipeNavigation(swipeTime);
+        }
+        
+        // Reset container transform if we added visual feedback
+        this.container.style.transform = '';
+        
         this.isDragging = false;
         this.initialTouchDistance = 0;
+        this.isSwipingHorizontally = null;
+        
       } else if (this.touches.length === 1) {
         // Switched from pinch to pan
         this.initialTouchDistance = 0;
+        this.isSwipingHorizontally = null;
+        
         if (this.scale > 1) {
           this.isDragging = true;
           this.dragStartX = this.touches[0].clientX;
           this.dragStartY = this.touches[0].clientY;
           this.dragStartPanX = this.panX;
           this.dragStartPanY = this.panY;
+        }
+      }
+    }
+    
+    handleSwipeNavigation(swipeTime) {
+      const deltaX = this.swipeEndX - this.swipeStartX;
+      const deltaY = Math.abs(this.swipeEndY - this.swipeStartY);
+      const distance = Math.abs(deltaX);
+      
+      // Check if it's a valid swipe:
+      // - Horizontal distance is sufficient
+      // - Vertical movement is limited
+      // - Swipe was quick enough
+      // - Only navigate if there are multiple images
+      if (distance >= this.minSwipeDistance && 
+          deltaY <= this.maxVerticalSwipe && 
+          swipeTime <= this.maxSwipeTime &&
+          this.images.length > 1) {
+        
+        if (deltaX > 0) {
+          // Swipe right - go to previous image
+          this.previousImage();
+        } else {
+          // Swipe left - go to next image
+          this.nextImage();
         }
       }
     }
