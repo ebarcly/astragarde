@@ -32,6 +32,7 @@ const { title, description = defaultDesc, navigation } = Astro.props as Props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <script type="text/javascript" async="" src="https://static.klaviyo.com/onsite/js/RdCGuR/klaviyo.js"></script>
     <style is:global>
       @import "../styles/global.css";
     </style>
@@ -46,6 +47,7 @@ const { title, description = defaultDesc, navigation } = Astro.props as Props;
     <main>
       <slot />
     </main>
+    <div class="klaviyo-form-SkpXN6"></div>
     <Footer />
     <SearchDialog client:load/>
   </body>
