@@ -35,6 +35,9 @@ importers:
       svelte:
         specifier: ^5.28.1
         version: 5.32.1
+      swiper:
+        specifier: ^11.2.8
+        version: 11.2.8
       zod:
         specifier: ^3.24.3
         version: 3.25.17
@@ -2247,6 +2250,10 @@ packages:
   svelte@5.32.1:
     resolution: {integrity: sha512-tT02QOeF0dbSIQ+/rUZw+76DyO6ATHvZJGOM2A/Ed6fBwZwUxqIun3beErpePAtwFIK3Mi9k2QAnhFVvUBun8g==}
     engines: {node: '>=18'}
+
+  swiper@11.2.8:
+    resolution: {integrity: sha512-S5FVf6zWynPWooi7pJ7lZhSUe2snTzqLuUzbd5h5PHUOhzgvW0bLKBd2wv0ixn6/5o9vwc/IkQT74CRcLJQzeg==}
+    engines: {node: '>= 4.7.0'}
 
   tailwindcss@4.1.7:
     resolution: {integrity: sha512-kr1o/ErIdNhTz8uzAYL7TpaUuzKIE6QPQ4qmSdxnoX/lo+5wmUHQA6h3L5yIqEImSRnAAURDirLu/BgiXGPAhg==}
@@ -4919,6 +4926,8 @@ snapshots:
       locate-character: 3.0.0
       magic-string: 0.30.17
       zimmerframe: 1.1.2
+
+  swiper@11.2.8: {}
 
   tailwindcss@4.1.7: {}
 

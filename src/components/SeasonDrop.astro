@@ -1,8 +1,7 @@
 ---
 import Products from './Products.svelte';
-
-
-import mockupProducts from '$/utils/mockup.ts';
+import Slider from './Slider.svelte';
+// import mockupProducts from '$/utils/mockup.ts';
 
 // Props interface for CMS integration
 export interface Props {
@@ -12,12 +11,12 @@ export interface Props {
   linkUrl?: string;
   buttonText?: string;
   buttonUrl?: string;
-  endDate?: string; // ISO string format
+  endDate?: string;
   backgroundColor?: string;
   products?: any[];
 }
 
-// Default values (can be overridden by CMS)
+// Default values
 const {
   title = "Summer Drop",
   linkText = "Be the first to know",
@@ -76,7 +75,7 @@ const {
 
 <!-- products -->
 <div id="seasonProducts" class="section-padding-x! mt-16 mb-16">
-  <Products products={products.slice(0, 8)} layout="horizontal" />
+  <Slider products={products.slice(0, 8)} layout="horizontal" client:load/>
 </div>
 
 <!-- paragraph -->
@@ -130,7 +129,7 @@ const {
 
 <!-- products -->
 <div id="seasonProducts" class="section-padding-x! mt-16 mb-16">
-  <Products products={products.slice(0, 8)} layout="horizontal" />
+  <Slider products={products.slice(0, 8)} layout="horizontal" client:load />
 </div>
 
 <!-- 2 column grid -->
@@ -225,11 +224,6 @@ const {
     new CountdownTimer(endDate);
   });
 
-  // Optional: Listen for countdown end event
-   // You can add custom logic here, like hiding the section or showing a message
-  // document.addEventListener("countdownEnded", (event) => {
-  //   console.log("Countdown has ended!");
-  // });
 </script>
 
 <style>
