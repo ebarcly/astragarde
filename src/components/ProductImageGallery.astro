@@ -124,13 +124,6 @@ const { images } = Astro.props as Props;
     <span id="current-image">1</span> / <span id="total-images">{images.nodes.length}</span>
   </div>
   
-  <!-- Fullscreen mode indicator -->
-  <div id="fullscreen-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="text-center">
-      <div class="text-lg font-semibold">Fullscreen Mode</div>
-      <div class="text-sm opacity-80">Tap to exit</div>
-    </div>
-  </div>
 </div>
 <style>
   .cursor-grabbing {
@@ -219,7 +212,7 @@ const { images } = Astro.props as Props;
   
   .fullscreen-mode #lightbox-toolbar,
   .fullscreen-mode #lightbox-close,
-  .fullscreen-mode .absolute:not(#lightbox-container):not(#lightbox-image):not(#fullscreen-indicator) {
+  .fullscreen-mode .absolute:not(#lightbox-container):not(#lightbox-image) {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -227,7 +220,7 @@ const { images } = Astro.props as Props;
   
   .fullscreen-mode.show-controls #lightbox-toolbar,
   .fullscreen-mode.show-controls #lightbox-close,
-  .fullscreen-mode.show-controls .absolute:not(#lightbox-container):not(#lightbox-image):not(#fullscreen-indicator) {
+  .fullscreen-mode.show-controls .absolute:not(#lightbox-container):not(#lightbox-image) {
     opacity: 1;
     pointer-events: auto;
   }
@@ -295,7 +288,6 @@ const { images } = Astro.props as Props;
       this.zoomOutBtn = document.getElementById('zoom-out-btn');
       this.resetZoomBtn = document.getElementById('reset-zoom-btn');
       this.zoomLevelSpan = document.getElementById('zoom-level');
-      this.fullscreenIndicator = document.getElementById('fullscreen-indicator');
       
       this.init();
     }
@@ -554,12 +546,6 @@ const { images } = Astro.props as Props;
       
       this.isFullscreen = true;
       this.modal.classList.add('fullscreen-mode');
-      
-      // Show fullscreen indicator briefly
-      this.fullscreenIndicator.style.opacity = '1';
-      setTimeout(() => {
-        this.fullscreenIndicator.style.opacity = '0';
-      }, 2000);
       
       // Auto-hide controls after 3 seconds
       this.scheduleControlsHide();
