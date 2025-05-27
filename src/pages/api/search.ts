@@ -2,8 +2,8 @@
 import type { APIRoute } from "astro";
 import { getProducts } from "$/utils/shopify";
 
-export const POST: APIRoute = async ({ request }) => {
-  const url = new URL(request.url);
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+
   try {
     const { query, limit = 6 } = await request.json();
 
@@ -19,9 +19,10 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
+
     // Get the client IP for Shopify's buyer IP requirement
     const buyerIP =
-      url.searchParams.get("buyerIP") ||
+      clientAddress ||
       request.headers.get("x-forwarded-for") ||
       request.headers.get("cf-connecting-ip") ||
       request.headers.get("x-real-ip") ||
