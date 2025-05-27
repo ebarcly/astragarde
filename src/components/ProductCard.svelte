@@ -101,7 +101,7 @@ const secondImage = product?.images.nodes[1] || product?.featuredImage;
   </a>
   <!-- Info -->
   <div class="flex flex-col items-center mt-4 space-y-1">
-    <div class="font-primary text-lg font-semibold text-black">
+    <div class="font-secondary font-semibold tracking-wide text-base md:text-lg lg:text-xl text-zinc-800 text-center lg:text-center w-full">
       {#if isOnSale}
         <span class="text-sm text-gray-400 line-through mr-2">
           <Money showCurrency price={product?.variants.nodes[0].compareAtPrice!} />
@@ -113,7 +113,7 @@ const secondImage = product?.images.nodes[1] || product?.featuredImage;
         <Money showCurrency price={product?.variants.nodes[0].price!} />
       {/if}
     </div>
-    <a href="/products/{product?.handle}" class="font-primary text-base font-bold uppercase tracking-wider text-zinc-800 group-hover:underline transition">
+    <a href="/products/{product?.handle}" class="font-secondary font-semibold tracking-wide text-base md:text-lg lg:text-xl text-zinc-900 group-hover:underline transition truncate w-full text-center lg:text-center">
       {product?.title}
     </a>
     {#if colorVariants.length > 1}
@@ -121,7 +121,7 @@ const secondImage = product?.images.nodes[1] || product?.featuredImage;
         {#each colorVariants as [color, variantId]}
           <a
             href="/products/{product?.handle}?variant={variantId}"
-            class="h-4 w-4 rounded-full border {getColorClass(color)} transition-all hover:ring-2 hover:ring-gray-300"
+            class="h-4 w-4 rounded-full border {getColorClass(color)} transition-all hover:ring-2 hover:ring-gray-300 mb-2"
             title={color}
             data-variant-id={variantId}
             aria-label={`Select color ${color}`}
