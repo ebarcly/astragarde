@@ -97,18 +97,21 @@ const { images } = Astro.props as Props;
       </svg>
     </button>
   </div>
-
   <!-- Close Button -->
   <button id="lightbox-close" class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 z-60 transform transition-all duration-200 hover:scale-110 hover:rotate-90">
     ×
   </button>
   
-  <!-- Navigation Buttons -->
-  <button id="lightbox-prev" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-4xl hover:text-gray-300 z-60 transition-all duration-200 hover:scale-110 hover:-translate-x-1">
-    ‹
+  <!-- Navigation Buttons - Enhanced for desktop -->
+  <button id="lightbox-prev" class="absolute left-2 md:left-20 xl:left-96 top-1/2 transform -translate-y-1/2 text-white z-60 transition-all duration-200 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full p-2 md:p-3 hover:scale-110 hover:-translate-x-1 border border-white/20">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="md:w-8 md:h-8">
+      <polyline points="15,18 9,12 15,6"></polyline>
+    </svg>
   </button>
-  <button id="lightbox-next" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl hover:text-gray-300 z-60 transition-all duration-200 hover:scale-110 hover:translate-x-1">
-    ›
+  <button id="lightbox-next" class="absolute right-2 md:right-20 xl:right-96 top-1/2 transform -translate-y-1/2 text-white z-60 transition-all duration-200 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full p-2 md:p-3 hover:scale-110 hover:translate-x-1 border border-white/20">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="md:w-8 md:h-8">
+      <polyline points="9,18 15,12 9,6"></polyline>
+    </svg>
   </button>
   
   <!-- Image Container -->
@@ -120,8 +123,15 @@ const { images } = Astro.props as Props;
   <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm transition-all duration-200">
     <span id="current-image">1</span> / <span id="total-images">{images.nodes.length}</span>
   </div>
+  
+  <!-- Fullscreen mode indicator -->
+  <div id="fullscreen-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="text-center">
+      <div class="text-lg font-semibold">Fullscreen Mode</div>
+      <div class="text-sm opacity-80">Tap to exit</div>
+    </div>
+  </div>
 </div>
-
 <style>
   .cursor-grabbing {
     cursor: grabbing !important;
@@ -164,7 +174,6 @@ const { images } = Astro.props as Props;
   .loading-pulse {
     animation: subtlePulse 1.5s ease-in-out infinite;
   }
-
   /* Hide scrollbars during pan */
   #lightbox-container {
     scrollbar-width: none;
@@ -174,7 +183,6 @@ const { images } = Astro.props as Props;
   #lightbox-container::-webkit-scrollbar {
     display: none;
   }
-
   /* Swipe navigation indicator */
   .swipe-indicator {
     position: absolute;
@@ -195,8 +203,48 @@ const { images } = Astro.props as Props;
   .swipe-indicator.show {
     opacity: 1;
   }
+  
+  /* Fullscreen mode styles */
+  .fullscreen-mode {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    z-index: 9999 !important;
+    background: black !important;
+  }
+  
+  .fullscreen-mode #lightbox-toolbar,
+  .fullscreen-mode #lightbox-close,
+  .fullscreen-mode .absolute:not(#lightbox-container):not(#lightbox-image):not(#fullscreen-indicator) {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .fullscreen-mode.show-controls #lightbox-toolbar,
+  .fullscreen-mode.show-controls #lightbox-close,
+  .fullscreen-mode.show-controls .absolute:not(#lightbox-container):not(#lightbox-image):not(#fullscreen-indicator) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .fullscreen-mode #lightbox-container {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+  
+  /* Enhanced navigation arrows */
+  #lightbox-prev, #lightbox-next {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
 </style>
-
 <script define:vars={{ images: images.nodes }}>
   class ImageLightbox {
     constructor(images) {
@@ -231,6 +279,12 @@ const { images } = Astro.props as Props;
       this.swipeStartTime = 0;
       this.maxSwipeTime = 300; // Maximum time for a swipe gesture
       
+      // Fullscreen mode
+      this.isFullscreen = false;
+      this.fullscreenThreshold = 1.5; // Scale threshold to trigger fullscreen
+      this.fullscreenControlsTimeout = null;
+      this.isMobile = window.innerWidth < 768;
+      
       // Elements
       this.modal = document.getElementById('lightbox-modal');
       this.image = document.getElementById('lightbox-image');
@@ -241,6 +295,7 @@ const { images } = Astro.props as Props;
       this.zoomOutBtn = document.getElementById('zoom-out-btn');
       this.resetZoomBtn = document.getElementById('reset-zoom-btn');
       this.zoomLevelSpan = document.getElementById('zoom-level');
+      this.fullscreenIndicator = document.getElementById('fullscreen-indicator');
       
       this.init();
     }
@@ -284,7 +339,11 @@ const { images } = Astro.props as Props;
       // Close on background click
       this.modal.addEventListener('click', (e) => {
         if (e.target === this.modal) {
-          this.closeLightbox();
+          if (this.isFullscreen) {
+            this.exitFullscreen();
+          } else {
+            this.closeLightbox();
+          }
         }
       });
       
@@ -293,7 +352,11 @@ const { images } = Astro.props as Props;
         if (!this.modal.classList.contains('hidden')) {
           switch(e.key) {
             case 'Escape':
-              this.closeLightbox();
+              if (this.isFullscreen) {
+                this.exitFullscreen();
+              } else {
+                this.closeLightbox();
+              }
               break;
             case 'ArrowLeft':
               this.previousImage();
@@ -311,8 +374,17 @@ const { images } = Astro.props as Props;
             case '0':
               this.resetZoom();
               break;
+            case 'f':
+            case 'F':
+              this.toggleFullscreen();
+              break;
           }
         }
+      });
+      
+      // Update mobile status on resize
+      window.addEventListener('resize', () => {
+        this.isMobile = window.innerWidth < 768;
       });
       
       // Update total images counter
@@ -336,6 +408,8 @@ const { images } = Astro.props as Props;
     }
     
     closeLightbox() {
+      this.exitFullscreen();
+      
       // Smooth fade-out animation
       this.modal.classList.remove('opacity-100');
       this.modal.classList.add('opacity-0');
@@ -397,6 +471,9 @@ const { images } = Astro.props as Props;
     
     resetZoom() {
       this.resetTransform();
+      if (this.isFullscreen) {
+        this.exitFullscreen();
+      }
     }
     
     setScale(newScale, centerX = null, centerY = null) {
@@ -418,6 +495,13 @@ const { images } = Astro.props as Props;
       this.updateTransform();
       this.updateZoomControls();
       this.updateCursor();
+      
+      // Check if we should enter fullscreen on mobile
+      if (this.isMobile && !this.isFullscreen && this.scale >= this.fullscreenThreshold) {
+        this.enterFullscreen();
+      } else if (this.isFullscreen && this.scale < this.fullscreenThreshold) {
+        this.exitFullscreen();
+      }
     }
     
     resetTransform() {
@@ -464,10 +548,69 @@ const { images } = Astro.props as Props;
       this.panY = Math.min(Math.max(this.panY, -maxPanY), maxPanY);
     }
     
+    // Fullscreen mode functions
+    enterFullscreen() {
+      if (!this.isMobile || this.isFullscreen) return;
+      
+      this.isFullscreen = true;
+      this.modal.classList.add('fullscreen-mode');
+      
+      // Show fullscreen indicator briefly
+      this.fullscreenIndicator.style.opacity = '1';
+      setTimeout(() => {
+        this.fullscreenIndicator.style.opacity = '0';
+      }, 2000);
+      
+      // Auto-hide controls after 3 seconds
+      this.scheduleControlsHide();
+    }
+    
+    exitFullscreen() {
+      if (!this.isFullscreen) return;
+      
+      this.isFullscreen = false;
+      this.modal.classList.remove('fullscreen-mode', 'show-controls');
+      this.clearControlsTimeout();
+    }
+    
+    toggleFullscreen() {
+      if (this.isFullscreen) {
+        this.exitFullscreen();
+      } else if (this.isMobile) {
+        this.enterFullscreen();
+      }
+    }
+    
+    scheduleControlsHide() {
+      this.clearControlsTimeout();
+      this.modal.classList.add('show-controls');
+      
+      this.fullscreenControlsTimeout = setTimeout(() => {
+        if (this.isFullscreen) {
+          this.modal.classList.remove('show-controls');
+        }
+      }, 3000);
+    }
+    
+    clearControlsTimeout() {
+      if (this.fullscreenControlsTimeout) {
+        clearTimeout(this.fullscreenControlsTimeout);
+        this.fullscreenControlsTimeout = null;
+      }
+    }
+    
     // Mouse event handlers
     handleImageClick(e) {
       if (!this.isDragging) {
-        if (this.scale === 1) {
+        if (this.isFullscreen) {
+          // In fullscreen, single tap shows/hides controls
+          if (this.modal.classList.contains('show-controls')) {
+            this.modal.classList.remove('show-controls');
+            this.clearControlsTimeout();
+          } else {
+            this.scheduleControlsHide();
+          }
+        } else if (this.scale === 1) {
           this.setScale(2, e.clientX, e.clientY);
         } else {
           this.resetZoom();
@@ -522,6 +665,11 @@ const { images } = Astro.props as Props;
     handleTouchStart(e) {
       e.preventDefault();
       this.touches = Array.from(e.touches);
+      
+      // Show controls on touch in fullscreen mode
+      if (this.isFullscreen) {
+        this.scheduleControlsHide();
+      }
       
       if (this.touches.length === 1) {
         const touch = this.touches[0];
