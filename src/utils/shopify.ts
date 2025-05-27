@@ -58,7 +58,6 @@ const makeShopifyRequest = async (
     const body = await response.text();
     throw new Error(`${response.status} ${body}`);
   }
-
   const json = await response.json();
   if (json.errors) {
     throw new Error(json.errors.map((e: Error) => e.message).join("\n"));

@@ -21,12 +21,38 @@ if (!product) {
   Astro.response.status = 404;
 }
 
-// Get the selected variant from URL or default to first variant
+// Enhanced variant selection logic
 const url = new URL(Astro.request.url);
 const variantId = url.searchParams.get('variant');
-const selectedVariant = variantId 
-  ? product?.variants.nodes.find(v => v.id === variantId)
-  : product?.variants.nodes[0];
+
+// Helper to find variant by ID or get first available variant
+const getSelectedVariant = () => {
+  if (!product?.variants.nodes.length) return null;
+  
+  // If variant ID is provided, try to find it
+  if (variantId) {
+    const foundVariant = product.variants.nodes.find(v => v.id === variantId);
+    if (foundVariant) return foundVariant;
+  }
+  
+  // Fall back to first available variant, or first variant if none are available
+  const availableVariant = product.variants.nodes.find(v => 
+    v.availableForSale && v.quantityAvailable > 0
+  );
+  
+  return availableVariant || product.variants.nodes[0];
+};
+
+const selectedVariant = getSelectedVariant();
+
+// Debug logging for development
+if (import.meta.env.DEV) {
+  console.log('Product options:', product?.options);
+  console.log('Selected variant:', selectedVariant);
+  console.log('Available variants:', product?.variants.nodes.filter(v => 
+    v.availableForSale && v.quantityAvailable > 0
+  ).length);
+}
 
 setCache.short(Astro);
 ---

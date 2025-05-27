@@ -69,6 +69,13 @@ export const VariantResult = z.object({
   ),
 });
 
+// Add ProductOption schema for cleaner option handling
+export const ProductOptionResult = z.object({
+  id: z.string(),
+  name: z.string(),
+  values: z.array(z.string()),
+});
+
 export const ProductResult = z
   .object({
     id: z.string(),
@@ -78,6 +85,8 @@ export const ProductResult = z
     images: z.object({
       nodes: z.array(ImageResult),
     }),
+    // Add options array to get all available option names and values
+    options: z.array(ProductOptionResult),
     variants: z.object({
       nodes: z.array(VariantResult),
     }),

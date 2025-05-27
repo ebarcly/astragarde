@@ -1,6 +1,6 @@
 ---
 import type { z } from "zod";
-import type { MoneyV2Result, ProductResult } from "../utils/schemas";
+import { VariantResult, type MoneyV2Result, type ProductResult } from "../utils/schemas";
 import Money from "./Money.svelte";
 
 export interface Props {
@@ -12,36 +12,196 @@ export interface Props {
 
 const { price, title, product, selectedVariant } = Astro.props as Props;
 
-// Get unique variants grouped by option type
-const getVariantsByOption = (optionName: string) => {
-  if (!product?.variants.nodes) return [];
-  const variants = new Map();
+// Helper to check if variant is available
+const isVariantAvailable = (variant: z.infer<typeof VariantResult>) => {
+  return variant.availableForSale && variant.quantityAvailable > 0;
+};
+
+// Get only available variants upfront for better performance
+const availableVariants = product?.variants.nodes.filter(isVariantAvailable) || [];
+
+// Create efficient availability map
+const createAvailabilityMap = () => {
+  const optionAvailability: Record<string, Record<string, Set<string>>> = {};
   
-  product.variants.nodes.forEach((variant) => {
-    const option = variant.selectedOptions?.find(
-      (opt) => opt.name.toLowerCase() === optionName.toLowerCase()
-    );
-    if (option) {
-      variants.set(option.value, variant.id);
-    }
+  availableVariants.forEach(variant => {
+    variant.selectedOptions.forEach((option) => {
+      const optionName = option.name.toLowerCase();
+      const optionValue = option.value;
+      
+      if (!optionAvailability[optionName]) {
+        optionAvailability[optionName] = {};
+      }
+      
+      if (!optionAvailability[optionName][optionValue]) {
+        optionAvailability[optionName][optionValue] = new Set();
+      }
+      
+      // Store what other option combinations work with this option value
+      variant.selectedOptions.forEach(otherOption => {
+        if (otherOption.name !== option.name) {
+          optionAvailability[optionName][optionValue].add(
+            `${otherOption.name.toLowerCase()}:${otherOption.value}`
+          );
+        }
+      });
+    });
   });
   
-  return Array.from(variants.entries());
+  return optionAvailability;
 };
 
-// Get selected option value
-const getSelectedOption = (optionName: string) => {
-  if (!selectedVariant?.selectedOptions) return null;
-  const option = selectedVariant.selectedOptions.find(
-    (opt) => opt.name.toLowerCase() === optionName.toLowerCase()
+const availabilityMap = createAvailabilityMap();
+
+// Get current selections from selected variant
+const getCurrentSelections = () => {
+  if (!selectedVariant?.selectedOptions) return {};
+  
+  const selections: Record<string, string> = {};
+  selectedVariant.selectedOptions.forEach(option => {
+    selections[option.name.toLowerCase()] = option.value;
+  });
+  return selections;
+};
+
+const currentSelections = getCurrentSelections();
+
+// Check if an option value is available given current selections
+const isOptionValueAvailable = (optionName: string, optionValue: string) => {
+  const optionKey = optionName.toLowerCase();
+  
+  if (!availabilityMap[optionKey]?.[optionValue]) return false;
+  
+  // Check if this option value is compatible with current selections
+  const compatibleOptions = availabilityMap[optionKey][optionValue];
+  
+  return Object.entries(currentSelections)
+    .filter(([key]) => key !== optionKey)
+    .every(([selectedOptionName, selectedValue]) => {
+      if (!selectedValue) return true;
+      return compatibleOptions.has(`${selectedOptionName}:${selectedValue}`);
+    });
+};
+
+// Find variant by exact option match
+const findVariantBySelections = (selections: Record<string, string>) => {
+  return availableVariants.find(variant => {
+    return variant.selectedOptions.every(option => {
+      const key = option.name.toLowerCase();
+      return selections[key] === option.value;
+    });
+  });
+};
+
+// NEW: Find best fallback variant when exact match isn't available
+const findBestFallbackVariant = (targetOptionName: string, targetOptionValue: string) => {
+  const targetKey = targetOptionName.toLowerCase();
+  
+  // Get all available variants that have the target option value
+  const variantsWithTargetOption = availableVariants.filter(variant =>
+    variant.selectedOptions.some(option => 
+      option.name.toLowerCase() === targetKey && option.value === targetOptionValue
+    )
   );
-  return option?.value || null;
+  
+  if (variantsWithTargetOption.length === 0) return null;
+  
+  // Define priority order for fallback (customize as needed)
+  const sizePriority = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  const getOptionValue = (variant: any, optionName: string) => {
+    const option = variant.selectedOptions.find((opt: any) => opt.name.toLowerCase() === optionName.toLowerCase());
+    return option?.value || '';
+  };
+  
+  // Sort variants by preference (you can customize this logic)
+  const sortedVariants = variantsWithTargetOption.sort((a, b) => {
+    // If we're selecting a size, prefer sizes close to current selection
+    if (targetKey === 'size') {
+      const currentSize = currentSelections.size;
+      if (currentSize) {
+        const currentIndex = sizePriority.indexOf(currentSize);
+        const aSize = getOptionValue(a, 'size');
+        const bSize = getOptionValue(b, 'size');
+        const aIndex = sizePriority.indexOf(aSize);
+        const bIndex = sizePriority.indexOf(bSize);
+        
+        const aDiff = Math.abs(aIndex - currentIndex);
+        const bDiff = Math.abs(bIndex - currentIndex);
+        
+        if (aDiff !== bDiff) return aDiff - bDiff;
+      }
+    }
+    
+    // If we're selecting a color, try to keep the same size
+    if (targetKey === 'color') {
+      const currentSize = currentSelections.size;
+      if (currentSize) {
+        const aHasCurrentSize = getOptionValue(a, 'size') === currentSize;
+        const bHasCurrentSize = getOptionValue(b, 'size') === currentSize;
+        
+        if (aHasCurrentSize && !bHasCurrentSize) return -1;
+        if (!aHasCurrentSize && bHasCurrentSize) return 1;
+      }
+    }
+    
+    // Fallback: prefer higher stock quantities
+    return b.quantityAvailable - a.quantityAvailable;
+  });
+  
+  return sortedVariants[0] || null;
 };
 
-const colorVariants = getVariantsByOption('color');
-const sizeVariants = getVariantsByOption('size');
-const selectedColor = getSelectedOption('color');
-const selectedSize = getSelectedOption('size');
+// Get variant for new selection with fallback logic
+const getVariantForSelection = (optionName: string, optionValue: string) => {
+  const newSelections = {
+    ...currentSelections,
+    [optionName.toLowerCase()]: optionValue
+  };
+  
+  // First try exact match
+  const exactMatch = findVariantBySelections(newSelections);
+  if (exactMatch) return exactMatch;
+  
+  // If no exact match, find best fallback
+  return findBestFallbackVariant(optionName, optionValue);
+};
+
+// Get organized options using product.options (cleaner approach)
+const getProductOptions = () => {
+  if (!product?.options) return [];
+  
+  return product.options.map(option => ({
+    name: option.name,
+    values: option.values.map(value => {
+      const exactVariant = getVariantForSelection(option.name, value);
+      const isExactMatch = exactVariant && Object.entries({
+        ...currentSelections,
+        [option.name.toLowerCase()]: value
+      }).every(([key, val]) => {
+        return exactVariant.selectedOptions.some(opt => 
+          opt.name.toLowerCase() === key && opt.value === val
+        );
+      });
+      
+      return {
+        value,
+        available: !!exactVariant, // Any variant (exact or fallback) makes it available
+        isExactMatch,
+        variant: exactVariant
+      };
+    })
+  }));
+};
+
+const productOptions = getProductOptions();
+
+// Get specific option types
+const colorOption = productOptions.find(opt => opt.name.toLowerCase() === 'color');
+const sizeOption = productOptions.find(opt => opt.name.toLowerCase() === 'size');
+
+// Current selections for display
+const selectedColor = currentSelections.color;
+const selectedSize = currentSelections.size;
 
 // Color mapping for swatches
 const getColorClass = (colorName: string) => {
@@ -54,7 +214,7 @@ const getColorClass = (colorName: string) => {
     white: "bg-white border-gray-300",
     gray: "bg-gray-400",
     grey: "bg-gray-400",
-    beige: "bg-beige",
+    beige: "bg-amber-100",
     brown: "bg-amber-800",
     orange: "bg-orange-500",
     pink: "bg-pink-500",
@@ -65,6 +225,14 @@ const getColorClass = (colorName: string) => {
 
 // Check if variant is low in stock
 const isLowStock = (quantity: number) => quantity <= 5 && quantity > 0;
+
+// Debug logging
+if (import.meta.env.DEV) {
+  console.log('Product options:', productOptions);
+  console.log('Current selections:', currentSelections);
+  console.log('Available variants count:', availableVariants.length);
+  console.log('Availability map:', availabilityMap);
+}
 ---
 
 <h1 class="font-primary mx-4 lg:mx-0 text-center lg:text-start text-4xl font-bold uppercase sm:text-4xl">
@@ -75,53 +243,97 @@ const isLowStock = (quantity: number) => quantity <= 5 && quantity > 0;
 </p>
 
 <!-- Size Selection -->
-{sizeVariants.length > 0 && (
+{sizeOption && (
   <div class="mt-6">
     <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
       Size
     </h3>
     <div class="mx-10 lg:mx-0 mt-2 grid grid-cols-4 gap-2">
-      {sizeVariants.map(([size, variantId]) => (
-        <button
-          type="button"
-          class={`px-3 py-2 text-sm font-medium transition-all cursor-pointer hover:bg-gray-100 ${
-            selectedSize === size
-              ? "border-2 border-black"
-              : "text-gray-900 border border-gray-300"
-          }`}
-          data-variant-id={variantId}
-          data-size={size}
-        >
-          {size}
-        </button>
-      ))}
+      {sizeOption.values.map(({ value: size, available, isExactMatch, variant }) => {
+        const isSelected = selectedSize === size;
+        const canSelect = available && variant;
+        
+        return (
+          <button
+            type="button"
+            class={`px-3 py-2 text-sm font-medium transition-all relative ${
+              canSelect ? 'cursor-pointer hover:bg-zinc-200' : 'cursor-not-allowed opacity-50'
+            } ${
+              isSelected
+                ? "border-2 border-black"
+                : "text-gray-900 border"
+            } ${
+              canSelect && !isExactMatch ? "border-zinc-400 bg-zinc-100" : ""
+            }`}
+            data-variant-id={canSelect ? variant.id : ''}
+            data-size={size}
+            data-is-fallback={canSelect && !isExactMatch ? "true" : "false"}
+            title={
+              !canSelect 
+                ? `Size ${size} not available` 
+                : !isExactMatch 
+                  ? `Size ${size} available in different color` 
+                  : `Select size ${size}`
+            }
+          >
+            {size}
+            {canSelect && !isExactMatch && (
+              <span class="absolute -top-1 -right-1 w-2 h-2 bg-zinc-400 rounded-full" 
+                    title="Will switch to available color combination" />
+            )}
+          </button>
+        );
+      })}
     </div>
   </div>
 )}
 
 <!-- Color Selection -->
-{colorVariants.length > 0 && (
+{colorOption && (
   <div class="mt-6">
     <h3 class="text-md text-center lg:text-start font-light text-zinc-800 uppercase">
       Color {selectedColor && `— ${selectedColor}`}
     </h3>
     <div class="mt-2 flex justify-center lg:justify-start gap-2">
-      {colorVariants.map(([color, variantId]) => (
-        <button
-          type="button"
-          class={`h-8 w-8 rounded-full transition-all cursor-pointer ${getColorClass(color)} ${
-            selectedColor === color
-              ? "ring-2 ring-black ring-offset-4"
-              : "hover:ring-2 hover:ring-gray-300"
-          }`}
-          title={color}
-          data-variant-id={variantId}
-          data-color={color}
-        />
-      ))}
+      {colorOption.values.map(({ value: color, available, isExactMatch, variant }) => {
+        const isSelected = selectedColor === color;
+        const canSelect = available && variant;
+        
+        return (
+          <button
+            type="button"
+            class={`h-8 w-8 rounded-full transition-all relative ${
+              canSelect ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+            } ${getColorClass(color)} ${
+              isSelected
+                ? "ring-2 ring-black ring-offset-4"
+                : canSelect 
+                  ? "hover:ring-2 hover:ring-gray-300" 
+                  : ""
+            } ${
+              canSelect && !isExactMatch ? "ring-2 ring-zinc-300 ring-offset-2" : ""
+            }`}
+            title={
+              !canSelect 
+                ? `${color} (Not available)` 
+                : !isExactMatch 
+                  ? `${color} available in different size` 
+                  : color
+            }
+            data-variant-id={canSelect ? variant.id : ''}
+            data-color={color}
+            data-is-fallback={canSelect && !isExactMatch ? "true" : "false"}
+          >
+            {canSelect && !isExactMatch && (
+              <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-zinc-400 rounded-full border border-white" />
+            )}
+          </button>
+        );
+      })}
     </div>
   </div>
 )}
+
 
 <!-- Stock Information -->
 {selectedVariant && (
@@ -151,14 +363,22 @@ const isLowStock = (quantity: number) => quantity <= 5 && quantity > 0;
 <script>
   // Add event listeners for variant selection
   document.addEventListener('DOMContentLoaded', function() {
-    // Handle variant selection (both size and color)
     const variantButtons = document.querySelectorAll('[data-variant-id]');
+    
     variantButtons.forEach(button => {
-      button.addEventListener('click', function() {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
         const variantId = this.getAttribute('data-variant-id');
-        if (variantId) {
+        
+        // Only proceed if we have a valid variant ID and button is not disabled
+        if (variantId && !this.disabled) {
+          // Show notification for fallback selections
           const url = new URL(window.location.href);
           url.searchParams.set('variant', variantId);
+          
+          // For better UX, you could update the UI without page reload here
+          // For now, we'll do a page reload to get the updated selectedVariant
           window.location.href = url.toString();
         }
       });
