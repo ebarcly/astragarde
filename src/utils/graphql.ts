@@ -62,7 +62,14 @@ fragment productFragment on Product {
       altText
     }
   }
-  variants(first: 10) {
+  # Add product options to get all available option names and values
+  options {
+    id
+    name
+    values
+  }
+  # Increase variant limit to capture all variants
+  variants(first: 20) {
     nodes {
       id
       title
