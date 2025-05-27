@@ -12,7 +12,7 @@
   onMount(() => {
     register();
     if (swiperEl) {
-      swiperEl.breakpoints = {
+      (swiperEl as any).breakpoints = {
         640: { slidesPerView: 2, spaceBetween: 2 },
         1024: { slidesPerView: 4, spaceBetween: 8 },
       };
@@ -33,9 +33,10 @@
   pagination={
     {
       "clickable": true,
+      "type": "bullets",
       "dynamicBullets": true,
       "renderBullet": (index, className) => {
-        return '<span class="' + className + '">' + (index + 1) + '</span>';
+        return '<span class="' + className + '"></span>';
       },
     }
   }
@@ -49,21 +50,6 @@
 </swiper-container>
 
 <style>
-.mySwiper {
-  width: 100%;
-  padding: 1rem 0;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  border: 1px solid #000000;
-}
-
-
 /* Pagination */
 :global(swiper-container::part(pagination)) {
     width: 100%;

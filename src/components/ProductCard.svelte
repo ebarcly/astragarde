@@ -22,7 +22,7 @@ const isSoldOut = !product?.variants.nodes.some(
   (variant) => variant.availableForSale
 );
 
-// Get unique colors from variants (assuming color is in the option values)
+// Get unique colors from variants
 const getColorVariants = () => {
   if (!product?.variants.nodes) return [];
 
@@ -75,88 +75,59 @@ const cardClasses = `relative ${sizeClasses[size]}`;
 const secondImage = product?.images.nodes[1] || product?.featuredImage;
 </script>
 
-<a href="/products/{product?.handle}" class="group block overflow-hidden">
-  <!-- card container -->
-  <div class={cardClasses}>
-    <!-- image container -->
-    <div class="relative flex h-full w-full items-center justify-center">
-      <!-- hover image (background) -->
+<div class="group flex flex-col h-full">
+  <!-- Image is the main link -->
+  <a href="/products/{product?.handle}" class="block">
+    <div class="relative w-full aspect-[4/5] overflow-hidden">
+      {#if isOnSale && !isSoldOut}
+        <div class="absolute top-3 left-3 bg-black/70 text-white text-xs px-3 py-1 font-semibold uppercase tracking-wider z-10">Sale</div>
+      {/if}
+      {#if isSoldOut}
+        <div class="absolute top-3 left-3 bg-gray-700/80 text-white text-xs px-3 py-1 font-semibold uppercase tracking-wider z-10">Sold Out</div>
+      {/if}
       <ShopifyImage
-        classList="w-full h-full object-cover object-center absolute inset-0"
+        classList="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
         loading="eager"
-        image={secondImage}
-        sizes="
-          (min-width: 1540px) 348px,
-          (min-width: 1280px) 284px,
-          (min-width: 1040px) 309px,
-          (min-width: 780px) 348px,
-          (min-width: 640px) 284px,
-          calc(100vw - 48px)
-        "
+        image={secondImage ?? null}
+        sizes="(min-width: 1540px) 348px, (min-width: 1280px) 284px, (min-width: 1040px) 309px, (min-width: 780px) 348px, (min-width: 640px) 284px, calc(100vw - 48px)"
       />
-      <!-- main image (foreground) -->
       <ShopifyImage
         classList="w-full h-full object-cover object-center absolute inset-0 transition-opacity duration-300 group-hover:opacity-0"
         loading="eager"
-        image={product?.featuredImage}
-        sizes="
-          (min-width: 1540px) 348px,
-          (min-width: 1280px) 284px,
-          (min-width: 1040px) 309px,
-          (min-width: 780px) 348px,
-          (min-width: 640px) 284px,
-          calc(100vw - 48px)
-        "
+        image={product?.featuredImage ?? null}
+        sizes="(min-width: 1540px) 348px, (min-width: 1280px) 284px, (min-width: 1040px) 309px, (min-width: 780px) 348px, (min-width: 640px) 284px, calc(100vw - 48px)"
       />
     </div>
-
-    <!-- Sale/Sold Out Badge -->
-    {#if isOnSale && !isSoldOut}
-      <div class="absolute top-2 left-2 bg-black px-2 py-1 text-xs font-medium text-white">
-        Sale
-      </div>
-    {/if}
-
-    {#if isSoldOut}
-      <div class="absolute top-2 left-2 bg-gray-500 px-2 py-1 text-xs font-medium text-white">
-        Sold Out
-      </div>
-    {/if}
-  </div>
-
-  <div class="flex flex-col items-center justify-between py-2 text-center text-zinc-700">
-    <!-- Price Section -->
-    <div class="font-primary mb-1 text-lg font-semibold text-black">
+  </a>
+  <!-- Info -->
+  <div class="flex flex-col items-center mt-4 space-y-1">
+    <div class="font-secondary font-semibold tracking-wide text-base md:text-lg lg:text-xl text-zinc-800 text-center lg:text-center w-full">
       {#if isOnSale}
-        <div class="flex items-center justify-center gap-2">
-          <span class="text-sm text-gray-500 line-through">
-            <Money showCurrency price={product?.variants.nodes[0].compareAtPrice!} />
-          </span>
-          <span class="text-black">
-            <Money showCurrency price={product?.variants.nodes[0].price} />
-          </span>
-        </div>
+        <span class="text-sm text-gray-400 line-through mr-2">
+          <Money showCurrency price={product?.variants.nodes[0].compareAtPrice!} />
+        </span>
+        <span>
+          <Money showCurrency price={product?.variants.nodes[0].price} />
+        </span>
       {:else}
         <Money showCurrency price={product?.variants.nodes[0].price!} />
       {/if}
     </div>
-    
-    <h3 class="font-primary mb-0.5 w-full text-base font-bold break-words">
+    <a href="/products/{product?.handle}" class="font-secondary font-semibold tracking-wide text-base md:text-lg lg:text-xl text-zinc-900 group-hover:underline transition truncate w-full text-center lg:text-center">
       {product?.title}
-    </h3>
-    
-    <!-- Color Swatches -->
+    </a>
     {#if colorVariants.length > 1}
-      <div class="mt-1 flex justify-center gap-1">
+      <div class="mt-1 flex justify-center gap-2">
         {#each colorVariants as [color, variantId]}
           <a
             href="/products/{product?.handle}?variant={variantId}"
-            class="h-4 w-4 rounded-full border {getColorClass(color)} transition-all hover:ring-2 hover:ring-gray-300"
+            class="h-4 w-4 rounded-full border {getColorClass(color)} transition-all hover:ring-2 hover:ring-gray-300 mb-2"
             title={color}
             data-variant-id={variantId}
+            aria-label={`Select color ${color}`}
           ></a>
         {/each}
       </div>
     {/if}
   </div>
-</a>
+</div>

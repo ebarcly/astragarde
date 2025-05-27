@@ -16,7 +16,7 @@ let { products, gap = 2, layout = "grid", cardSize }: Props = $props();
 </script>
 
 <section>
-  <div class="flex flex-col gap-4 py-16 sm:py-20">
+  <div class="flex flex-col gap-4 py-2 sm:py-12">
     <h2 class="sr-only">Products</h2>
     {#if layout === "horizontal"}
       <div

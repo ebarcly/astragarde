@@ -55,7 +55,9 @@
 </script>
 
 {#if isLoading}
-  <div class="py-20 text-center text-gray-500 h-screen">Cargando productos...</div>
+  <div class="py-20 text-center text-zinc-700 h-screen">Loading products...</div>
+{:else if products.length === 0}
+  <div class="py-20 text-center text-zinc-700 h-screen text-2xl font-primary">No products found. Try adjusting your filters.</div>
 {:else}
   <Products {products} />
 {/if}

@@ -6,6 +6,7 @@ import { getProducts } from "$/utils/shopify";
 import Filters from "$/components/Filters.astro";
 import Sorter from "$/components/Sorter.astro";
 import ProductsWrapper from "$/components/blocks/products/ProductsWrapper.svelte"
+import Slider from "$/components/Slider.svelte";
 
 const title = "Catalog";
 const headers = Astro.request.headers;
@@ -31,7 +32,7 @@ const limitedTime = [
 
 <BaseLayout title={title} navigation={{ variant: "relative", enableScrollAnimation: true }}>
   <LimitedTime products={limitedTime} />
-  <div class="section-padding-x grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <div class="section-padding-x grid grid-cols-1 md:grid-cols-12 gap-10 items-baseline">
     <!-- Sidebar Filters (collapsible on mobile) -->
     <!-- Mobile Filter Button -->
     <div class="block lg:hidden mb-4">
@@ -43,7 +44,7 @@ const limitedTime = [
       </button>
     </div>
     <!-- Desktop Sidebar -->
-    <aside class="hidden lg:block lg:col-span-3">
+    <aside class="py-4 hidden lg:block lg:col-span-3">
       <Filters />
     </aside>
     <!-- Mobile Filter Drawer/Modal -->
@@ -62,17 +63,13 @@ const limitedTime = [
     </div>
     <!-- Main Content -->
     <main class="lg:col-span-9">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="w-full sm:w-72 ml-auto">
           <Sorter />
         </div>
       </div>
       <ProductsWrapper client:load buyerIp={ip}/>
-      <!-- {products.length === 0 ? (
-        <div class="text-center text-zinc-500 py-20 text-lg">No products found. Try adjusting your filters.</div>
-      ) : (
-        <Products products={products} gap={6} layout="grid" />
-      )} -->
+      <Slider client:load buyerIp={ip}/>
     </main>
   </div>
 </BaseLayout>

@@ -1,25 +1,27 @@
 ---
 // FilterComponent.astro
 ---
-<div class="p-6 rounded-lg w-sm">
+<div class="p-4 rounded-sm bg-white shadow max-w-xs w-full md:w-72 relative z-10 border border-zinc-200">
   <!-- Active Filter Tags -->
-  <div id="activeFilterTags" class="mb-4 space-y-2 hidden">
-    <div id="availabilityTag" class="bg-green-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden">
+  <div id="activeFilterTags" class="mb-4 space-y-2 hidden" aria-live="polite" aria-atomic="true">
+    <div id="availabilityTag" class="bg-green-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden transition-all duration-200 ease-in-out">
       <span></span>
       <button 
-        class="ml-2 text-white hover:text-gray-200"
+        class="ml-2 text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded"
         data-filter="availability"
+        aria-label="Remove availability filter"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
     </div>
-    <div id="priceTag" class="bg-blue-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden">
+    <div id="priceTag" class="bg-blue-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden transition-all duration-200 ease-in-out">
       <span></span>
       <button 
-        class="ml-2 text-white hover:text-gray-200"
+        class="ml-2 text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded"
         data-filter="price"
+        aria-label="Remove price filter"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -94,13 +96,27 @@
           <div class="h-2 bg-gray-800 rounded-full relative" id="priceRange">
             <!-- Left Handle -->
             <div 
-              class="absolute -top-1 -left-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow"
+              class="absolute -top-1 -left-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-150"
               id="minHandle"
+              role="slider"
+              tabindex="0"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="198"
+              aria-label="Minimum price"
+              aria-valuetext="$0"
             ></div>
             <!-- Right Handle -->
             <div 
-              class="absolute -top-1 -right-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow"
+              class="absolute -top-1 -right-2 w-4 h-4 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-150"
               id="maxHandle"
+              role="slider"
+              tabindex="0"
+              aria-valuenow="199"
+              aria-valuemin="1"
+              aria-valuemax="199"
+              aria-label="Maximum price"
+              aria-valuetext="$199"
             ></div>
           </div>
         </div>
@@ -187,9 +203,11 @@ class FilterComponent {
     
     if (minHandle) {
       minHandle.addEventListener('mousedown', (e: MouseEvent) => this.startDrag(e, 'min'));
+      minHandle.addEventListener('keydown', (e: KeyboardEvent) => this.handleSliderKey(e, 'min'));
     }
     if (maxHandle) {
       maxHandle.addEventListener('mousedown', (e: MouseEvent) => this.startDrag(e, 'max'));
+      maxHandle.addEventListener('keydown', (e: KeyboardEvent) => this.handleSliderKey(e, 'max'));
     }
     
     document.addEventListener('mousemove', (e: MouseEvent) => this.drag(e));
@@ -293,13 +311,28 @@ class FilterComponent {
   
   private updateSliderPosition(): void {
     const priceRange = document.getElementById('priceRange');
+    const minHandle = document.getElementById('minHandle');
+    const maxHandle = document.getElementById('maxHandle');
     if (!priceRange) return;
 
     const minPercent = (this.currentMinPrice - this.minPrice) / (this.maxPrice - this.minPrice) * 100;
     const maxPercent = (this.currentMaxPrice - this.minPrice) / (this.maxPrice - this.minPrice) * 100;
-    
     priceRange.style.left = `${minPercent}%`;
     priceRange.style.width = `${maxPercent - minPercent}%`;
+
+    // Update ARIA attributes for accessibility
+    if (minHandle) {
+      minHandle.setAttribute('aria-valuenow', String(this.currentMinPrice));
+      minHandle.setAttribute('aria-valuemin', String(this.minPrice));
+      minHandle.setAttribute('aria-valuemax', String(this.currentMaxPrice - 1));
+      minHandle.setAttribute('aria-valuetext', `$${this.currentMinPrice.toFixed(2)}`);
+    }
+    if (maxHandle) {
+      maxHandle.setAttribute('aria-valuenow', String(this.currentMaxPrice));
+      maxHandle.setAttribute('aria-valuemin', String(this.currentMinPrice + 1));
+      maxHandle.setAttribute('aria-valuemax', String(this.maxPrice));
+      maxHandle.setAttribute('aria-valuetext', `$${this.currentMaxPrice.toFixed(2)}`);
+    }
   }
   
   private updatePriceDisplay(): void {
@@ -457,6 +490,56 @@ class FilterComponent {
     this.updateFilterTags();
     this.updateStore();
   }
+
+  private handleSliderKey(e: KeyboardEvent, handle: 'min' | 'max'): void {
+    let step = 1;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+      if (handle === 'min') {
+        this.currentMinPrice = Math.max(this.minPrice, this.currentMinPrice - step);
+        if (this.currentMinPrice >= this.currentMaxPrice) this.currentMinPrice = this.currentMaxPrice - 1;
+      } else {
+        this.currentMaxPrice = Math.max(this.currentMinPrice + 1, this.currentMaxPrice - step);
+      }
+      this.updateSliderPosition();
+      this.updatePriceDisplay();
+      e.preventDefault();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+      if (handle === 'min') {
+        this.currentMinPrice = Math.min(this.currentMaxPrice - 1, this.currentMinPrice + step);
+      } else {
+        this.currentMaxPrice = Math.min(this.maxPrice, this.currentMaxPrice + step);
+      }
+      this.updateSliderPosition();
+      this.updatePriceDisplay();
+      e.preventDefault();
+    } else if (e.key === 'Home') {
+      if (handle === 'min') {
+        this.currentMinPrice = this.minPrice;
+      } else {
+        this.currentMaxPrice = this.maxPrice;
+      }
+      this.updateSliderPosition();
+      this.updatePriceDisplay();
+      e.preventDefault();
+    } else if (e.key === 'End') {
+      if (handle === 'min') {
+        this.currentMinPrice = this.currentMaxPrice - 1;
+      } else {
+        this.currentMaxPrice = this.maxPrice;
+      }
+      this.updateSliderPosition();
+      this.updatePriceDisplay();
+      e.preventDefault();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      // Apply filter on Enter/Space
+      this.filters.minPrice = this.currentMinPrice > this.minPrice ? this.currentMinPrice : null;
+      this.filters.maxPrice = this.currentMaxPrice < this.maxPrice ? this.currentMaxPrice : null;
+      this.updateFilterTags();
+      this.updateURL();
+      this.updateStore();
+      e.preventDefault();
+    }
+  }
 }
 
 // Initialize when DOM is loaded
@@ -464,3 +547,45 @@ document.addEventListener('DOMContentLoaded', () => {
   new FilterComponent();
 });
 </script>
+
+<style>
+  /* Responsive slider */
+  #priceSlider {
+    min-width: 180px;
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+  @media (max-width: 640px) {
+    #priceSlider {
+      min-width: 120px;
+      padding: 0 0.25rem;
+    }
+  }
+  /* Focus style for slider handles */
+  #minHandle:focus, #maxHandle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px #10b98166;
+    border-color: #10b981;
+    z-index: 2;
+  }
+  /* Tag animation */
+  #activeFilterTags > div {
+    transition: opacity 0.2s, transform 0.2s;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #activeFilterTags > div.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+  /* Slider handle hover/active */
+  #minHandle:hover, #maxHandle:hover, #minHandle:active, #maxHandle:active {
+    background: #bebebe;
+    border-color: #eaeaea;
+  }
+  /* Make slider robust on all screens */
+  #priceSlider, #priceRange {
+    box-sizing: border-box;
+  }
+</style>
