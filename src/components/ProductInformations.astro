@@ -66,23 +66,6 @@ const getCurrentSelections = () => {
 
 const currentSelections = getCurrentSelections();
 
-// Check if an option value is available given current selections
-const isOptionValueAvailable = (optionName: string, optionValue: string) => {
-  const optionKey = optionName.toLowerCase();
-  
-  if (!availabilityMap[optionKey]?.[optionValue]) return false;
-  
-  // Check if this option value is compatible with current selections
-  const compatibleOptions = availabilityMap[optionKey][optionValue];
-  
-  return Object.entries(currentSelections)
-    .filter(([key]) => key !== optionKey)
-    .every(([selectedOptionName, selectedValue]) => {
-      if (!selectedValue) return true;
-      return compatibleOptions.has(`${selectedOptionName}:${selectedValue}`);
-    });
-};
-
 // Find variant by exact option match
 const findVariantBySelections = (selections: Record<string, string>) => {
   return availableVariants.find(variant => {
@@ -251,36 +234,27 @@ if (import.meta.env.DEV) {
     <div class="mx-10 lg:mx-0 mt-2 grid grid-cols-4 gap-2">
       {sizeOption.values.map(({ value: size, available, isExactMatch, variant }) => {
         const isSelected = selectedSize === size;
-        const canSelect = available && variant;
         
         return (
           <button
             type="button"
-            class={`px-3 py-2 text-sm font-medium transition-all relative ${
-              canSelect ? 'cursor-pointer hover:bg-zinc-200' : 'cursor-not-allowed opacity-50'
-            } ${
+            class={`px-3 py-2 text-sm font-medium transition-all cursor-pointer hover:bg-zinc-200 ${
               isSelected
                 ? "border-2 border-black"
                 : "text-gray-900 border"
-            } ${
-              canSelect && !isExactMatch ? "border-zinc-400 bg-zinc-100" : ""
             }`}
-            data-variant-id={canSelect ? variant.id : ''}
+            data-variant-id={variant?.id || ''}
             data-size={size}
-            data-is-fallback={canSelect && !isExactMatch ? "true" : "false"}
+            data-is-fallback={available && !isExactMatch ? "true" : "false"}
             title={
-              !canSelect 
-                ? `Size ${size} not available` 
+              !available 
+                ? `Size ${size} available in different color` 
                 : !isExactMatch 
                   ? `Size ${size} available in different color` 
                   : `Select size ${size}`
             }
           >
             {size}
-            {canSelect && !isExactMatch && (
-              <span class="absolute -top-1 -right-1 w-2 h-2 bg-zinc-400 rounded-full" 
-                    title="Will switch to available color combination" />
-            )}
           </button>
         );
       })}
@@ -297,35 +271,31 @@ if (import.meta.env.DEV) {
     <div class="mt-2 flex justify-center lg:justify-start gap-2">
       {colorOption.values.map(({ value: color, available, isExactMatch, variant }) => {
         const isSelected = selectedColor === color;
-        const canSelect = available && variant;
         
         return (
           <button
             type="button"
-            class={`h-8 w-8 rounded-full transition-all relative ${
-              canSelect ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-            } ${getColorClass(color)} ${
+            class={`h-8 w-8 rounded-full transition-all cursor-pointer relative ${getColorClass(color)} ${
               isSelected
                 ? "ring-2 ring-black ring-offset-4"
-                : canSelect 
-                  ? "hover:ring-2 hover:ring-gray-300" 
-                  : ""
-            } ${
-              canSelect && !isExactMatch ? "ring-2 ring-zinc-300 ring-offset-2" : ""
+                : "hover:ring-2 hover:ring-gray-300"
             }`}
             title={
-              !canSelect 
-                ? `${color} (Not available)` 
+              !available 
+                ? `${color} available in different size` 
                 : !isExactMatch 
                   ? `${color} available in different size` 
                   : color
             }
-            data-variant-id={canSelect ? variant.id : ''}
+            data-variant-id={variant?.id || ''}
             data-color={color}
-            data-is-fallback={canSelect && !isExactMatch ? "true" : "false"}
+            data-is-fallback={available && !isExactMatch ? "true" : "false"}
           >
-            {canSelect && !isExactMatch && (
-              <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-zinc-400 rounded-full border border-white" />
+            {/* Strikethrough for unavailable exact matches */}
+            {!isExactMatch && (
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-full h-0.5 bg-zinc-500 rotate-45 transform"></div>
+              </div>
             )}
           </button>
         );
@@ -333,7 +303,6 @@ if (import.meta.env.DEV) {
     </div>
   </div>
 )}
-
 
 <!-- Stock Information -->
 {selectedVariant && (
@@ -371,9 +340,8 @@ if (import.meta.env.DEV) {
         
         const variantId = this.getAttribute('data-variant-id');
         
-        // Only proceed if we have a valid variant ID and button is not disabled
-        if (variantId && !this.disabled) {
-          // Show notification for fallback selections
+        // Only proceed if we have a valid variant ID
+        if (variantId) {
           const url = new URL(window.location.href);
           url.searchParams.set('variant', variantId);
           
