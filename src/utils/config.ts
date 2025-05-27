@@ -8,7 +8,7 @@ const defineConfig = {
     .PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN
     ? import.meta.env.PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN
     : "",
-  apiVersion: "2025-01",
+  apiVersion: "2025-04",
 };
 
 export const config = configSchema.parse(defineConfig);

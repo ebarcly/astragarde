@@ -63,7 +63,6 @@ const makeShopifyRequest = async (
   if (json.errors) {
     throw new Error(json.errors.map((e: Error) => e.message).join("\n"));
   }
-  console.log(json);
   return json.data;
 };
 
