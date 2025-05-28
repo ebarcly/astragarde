@@ -33,7 +33,7 @@ const limitedTime = [
   <LimitedTime products={limitedTime} />
   <div class="section-padding-x flex flex-col lg:flex-row gap-8">
     <aside class="hidden lg:block w-80 max-w-xs lg:pr-8">
-      <Filters />
+      <Filters instanceId="desktop-filters" />
     </aside>
     <main class="w-full mx-auto">
       <div class="flex flex-row w-full mx-auto items-center gap-4 mt-6 md:mt-0">
@@ -63,7 +63,7 @@ const limitedTime = [
       >
         Close
       </button>
-      <Filters />
+      <Filters instanceId="mobile-filters" />
     </div>
     <!-- Click outside to close -->
     <div class="absolute inset-0" onclick="document.getElementById('mobileFilter').classList.add('hidden')"></div>
