@@ -1,6 +1,12 @@
 import { getProducts } from "$/utils/shopify";
 
-export async function GET({ request }: { request: Request }) {
+export async function GET({
+  request,
+  clientAddress,
+}: {
+  request: Request;
+  clientAddress: any;
+}) {
   const url = new URL(request.url);
 
   const isAvailable = url.searchParams.get("availability")?.toLowerCase();
@@ -10,6 +16,7 @@ export async function GET({ request }: { request: Request }) {
   const reverse = url.searchParams.get("reverse") === "true";
 
   const buyerIP =
+    clientAddress ||
     url.searchParams.get("buyerIP") ||
     request.headers.get("x-forwarded-for") ||
     request.headers.get("cf-connecting-ip") ||
@@ -28,7 +35,10 @@ export async function GET({ request }: { request: Request }) {
 
   // Availability filter
   if (isAvailable) {
-    const availabilityQuery = isAvailable === "true" ? "available_for_sale:true" : "available_for_sale:false";
+    const availabilityQuery =
+      isAvailable === "true"
+        ? "available_for_sale:true"
+        : "available_for_sale:false";
     queryParts.push(availabilityQuery);
   }
 
@@ -36,11 +46,11 @@ export async function GET({ request }: { request: Request }) {
   if (priceMin && !isNaN(Number(priceMin))) {
     queryParts.push(`variants.price:>=${priceMin}`);
   }
-  
+
   if (priceMax && !isNaN(Number(priceMax))) {
     queryParts.push(`variants.price:<=${priceMax}`);
   }
-  
+
   const query = queryParts.length > 0 ? queryParts.join(" AND ") : "";
 
   const products = await getProducts({
