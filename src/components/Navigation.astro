@@ -56,7 +56,7 @@ const useWhiteIcons = variant === "absolute";
     <div class="flex justify-start">
       <button
         id={openSidebarId}
-        class="cursor-pointer p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        class="cursor-pointer p-2 rounded-md"
         aria-label="Open menu"
       >
         <Hamburger color={useWhiteIcons ? "white" : undefined} />
@@ -72,7 +72,7 @@ const useWhiteIcons = variant === "absolute";
 
     <!-- Icons (cart, search) -->
     <div class="flex justify-end gap-2 sm:gap-4">
-      <button id={searchTriggerId} class="cursor-pointer p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
+      <button id={searchTriggerId} class="cursor-pointer p-2 rounded-md" aria-label="Search">
         <SearchIcon color={useWhiteIcons ? "white" : undefined} />
       </button>
       <div class="flex items-center">
@@ -90,7 +90,7 @@ const useWhiteIcons = variant === "absolute";
         <div class="flex justify-start">
           <button
             id={openSidebarScrolledId}
-            class="cursor-pointer p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            class="cursor-pointer p-2 rounded-md"
             aria-label="Open menu"
           >
             <Hamburger />
@@ -102,7 +102,7 @@ const useWhiteIcons = variant === "absolute";
           </a>
         </div>
         <div class="flex justify-end gap-2 sm:gap-4">
-          <button id={searchTriggerScrolledId} class="cursor-pointer p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Search">
+          <button id={searchTriggerScrolledId} class="cursor-pointer p-2 rounded-md" aria-label="Search">
             <SearchIcon />
           </button>
           <div class="flex items-center">

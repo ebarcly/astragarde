@@ -35,7 +35,7 @@ const currentOption = options.find(opt => opt.value === currentSort) || options[
   <!-- Main dropdown button -->
 <button 
   type="button" 
-  class="sorter-button w-full px-3 lg:px-4 py-2 lg:py-3 text-left bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between text-xs lg:text-sm rounded-lg"
+  class="sorter-button w-full px-3 lg:px-4 py-2 lg:py-3 text-left border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 flex items-center justify-between text-xs lg:text-sm rounded-lg"
   aria-haspopup="true"
   aria-expanded="false"
 >
@@ -60,7 +60,7 @@ const currentOption = options.find(opt => opt.value === currentSort) || options[
             type="button"
             class={`sorter-option w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${
               option.value === currentSort 
-                ? 'bg-blue-600 text-white' 
+                ? 'bg-zinc-600 text-white' 
                 : 'text-gray-900'
             }`}
             data-value={option.value}
@@ -118,9 +118,9 @@ const currentOption = options.find(opt => opt.value === currentSort) || options[
           const value = option.getAttribute('data-value') as SortOption;
           if (value === newValue) {
             option.classList.remove('text-gray-900');
-            option.classList.add('bg-blue-600', 'text-white');
+            option.classList.add('bg-zinc-600', 'text-white');
           } else {
-            option.classList.remove('bg-blue-600', 'text-white');
+            option.classList.remove('bg-zinc-600', 'text-white');
             option.classList.add('text-gray-900');
           }
         });

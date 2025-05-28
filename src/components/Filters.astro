@@ -8,13 +8,13 @@ const { instanceId } = Astro.props;
 const elId = (id: string) => `${instanceId}-${id}`;
 ---
 
-<div class="p-4 rounded-sm bg-white shadow w-full max-w-full relative z-10 border border-zinc-200" data-filter-instance={instanceId}>
+<div class="p-4 rounded-sm w-full max-w-full relative z-10 border border-zinc-200" data-filter-instance={instanceId}>
   {/* Active Filter Tags */}
   <div id={elId("activeFilterTags")} class="mb-4 space-y-2 hidden" aria-live="polite" aria-atomic="true">
     <div id={elId("availabilityTag")} class="bg-green-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden transition-all duration-200 ease-in-out">
       <span></span>
       <button
-        class="ml-2 text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded"
+        class="ml-2 text-white hover:text-gray-200 focus:outline-none rounded"
         data-filter-type="availability"  aria-label="Remove availability filter"
       >
         <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@ const elId = (id: string) => `${instanceId}-${id}`;
     <div id={elId("priceTag")} class="bg-blue-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden transition-all duration-200 ease-in-out">
       <span></span>
       <button
-        class="ml-2 text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded"
+        class="ml-2 text-white hover:text-gray-200 focus:outline-none rounded"
         data-filter-type="price" aria-label="Remove price filter"
       >
         <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@ const elId = (id: string) => `${instanceId}-${id}`;
 
     <div class="space-y-3" id={elId("availabilityOptions")}>
       <button
-        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded w-full focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded w-full focus:outline-none "
         id={elId("inStockButton")} data-availability="true" role="checkbox" aria-checked="false"
       >
         <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center border border-gray-300 rounded-sm">
@@ -61,7 +61,7 @@ const elId = (id: string) => `${instanceId}-${id}`;
       </button>
 
       <button
-        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded w-full focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        class="flex items-center cursor-pointer text-left hover:bg-gray-100 p-1 rounded w-full focus:outline-none"
         id={elId("outOfStockButton")} data-availability="false" role="checkbox" aria-checked="false"
       >
         <div class="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center border border-gray-300 rounded-sm">
@@ -95,12 +95,12 @@ const elId = (id: string) => `${instanceId}-${id}`;
         <div class="h-2 bg-gray-200 rounded-full">
           <div class="h-2 bg-gray-800 rounded-full relative" id={elId("priceRange")}>
             <div
-              class="absolute -top-1.5 -left-2 w-5 h-5 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-150"
+              class="absolute -top-1.5 -left-2 w-5 h-5 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-150"
               id={elId("minHandle")} role="slider" tabindex="0" aria-valuenow="0" aria-valuemin="0" aria-valuemax="198"
               aria-label="Minimum price" aria-valuetext="$0" style="touch-action: none;"
             ></div>
             <div
-              class="absolute -top-1.5 -right-2 w-5 h-5 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-150"
+              class="absolute -top-1.5 -right-2 w-5 h-5 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-150"
               id={elId("maxHandle")} role="slider" tabindex="0" aria-valuenow="199" aria-valuemin="1" aria-valuemax="199"
               aria-label="Maximum price" aria-valuetext="$199" style="touch-action: none;"
             ></div>

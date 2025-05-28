@@ -18,13 +18,13 @@ setCache.short(Astro);
 const limitedTime = [
   {
     title: "Shirt A",
-    linkUrl: "/collections/shirt-a",
-    img: "https://placehold.co/400x500?text=Shirt+A",
+    linkUrl: "/products/long-sleeve-tracksuit",
+    img: "https://cdn.shopify.com/s/files/1/0738/0929/7651/files/Astragarde0440.jpg?v=1747689465",
   },
   {
     title: "Shirt B",
-    linkUrl: "/collections/shirt-b",
-    img: "https://placehold.co/400x500?text=Shirt+B",
+    linkUrl: "/products/long-sleeve-tracksuit-copy-copy-copy",
+    img: "https://cdn.shopify.com/s/files/1/0738/0929/7651/files/jpgAstragarde9385.jpg?v=1748143199",
   },
 ];
 ---
@@ -32,7 +32,7 @@ const limitedTime = [
 <BaseLayout title={title} navigation={{ variant: "relative", enableScrollAnimation: true }}>
   <LimitedTime products={limitedTime} />
   <div class="section-padding-x flex flex-col lg:flex-row gap-8">
-    <aside class="hidden lg:block w-80 max-w-xs lg:pr-8">
+    <aside class="hidden lg:block w-80 max-w-xs lg:pr-8 mt-4">
       <Filters instanceId="desktop-filters" />
     </aside>
     <main class="w-full mx-auto">
@@ -47,7 +47,7 @@ const limitedTime = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0013 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 017 17v-3.586a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" />
           </svg>
         </button>
-        <div class="flex-1">
+        <div class="flex-1 mt-4">
           <Sorter />
         </div>
       </div>
