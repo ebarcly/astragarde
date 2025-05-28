@@ -11,7 +11,6 @@ import Slider from "$/components/Slider.svelte";
 const title = "Catalog";
 const headers = Astro.request.headers;
 const ip = headers.get("x-vercel-forwarded-for") || Astro.clientAddress;
-const products = await getProducts({ buyerIP: ip });
 
 setCache.short(Astro);
 
