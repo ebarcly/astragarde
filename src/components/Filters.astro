@@ -1,5 +1,6 @@
 ---
 // FilterComponent.astro
+ import { Slider } from "$lib/components/ui/slider/index";
 ---
 <div class="p-4 rounded-sm bg-white shadow w-full max-w-full relative z-10 border border-zinc-200">
   <!-- Active Filter Tags -->
@@ -127,6 +128,7 @@
 
 <script>
 import { filters } from "$/stores/filters";
+
 
 interface FilterState {
   availability: string | null;
