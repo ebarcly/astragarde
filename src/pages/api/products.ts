@@ -28,6 +28,7 @@ export async function GET({
     request.headers.get("forwarded") ||
     "::1";
 
+    
   // Build query parts
   const queryParts = [];
 
@@ -51,6 +52,7 @@ export async function GET({
 
   const query = queryParts.length > 0 ? queryParts.join(" AND ") : "";
 
+    console.log({ query, sortKey, reverse, buyerIP, queryParts });
   const products = await getProducts({
     limit: 10,
     buyerIP,
