@@ -1,7 +1,7 @@
 ---
 // FilterComponent.astro
 ---
-<div class="p-4 rounded-sm bg-white shadow max-w-xs w-full md:w-72 relative z-10 border border-zinc-200">
+<div class="p-4 rounded-sm bg-white shadow w-full max-w-full relative z-10 border border-zinc-200">
   <!-- Active Filter Tags -->
   <div id="activeFilterTags" class="mb-4 space-y-2 hidden" aria-live="polite" aria-atomic="true">
     <div id="availabilityTag" class="bg-green-700 text-white px-4 py-2 rounded flex items-center justify-between text-sm font-medium hidden transition-all duration-200 ease-in-out">
@@ -70,7 +70,7 @@
   </div>
 
   <!-- Price Filter -->
-  <div>
+  <div class="mb-8 w-full">
     <button 
       class="flex items-center justify-between text-left mb-4 focus:outline-none w-full"
       id="priceToggle"
@@ -91,7 +91,7 @@
       </div>
       
       <!-- Price Range Slider -->
-      <div class="relative w-full max-w-xs mx-auto" id="priceSlider">
+      <div class="relative w-full px-2 sm:px-4" id="priceSlider">
         <div class="h-2 bg-gray-200 rounded-full">
           <div class="h-2 bg-gray-800 rounded-full relative" id="priceRange">
             <!-- Left Handle -->

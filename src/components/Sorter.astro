@@ -31,19 +31,19 @@ const currentSort = sort.get();
 const currentOption = options.find(opt => opt.value === currentSort) || options[0];
 ---
 
-<div class="relative inline-block w-72 self-end" data-dropdown={dropdownId}>
+<div class="relative inline-block w-full lg:w-72 self-end" data-dropdown={dropdownId}>
   <!-- Main dropdown button -->
-  <button 
-    type="button" 
-    class="sorter-button w-full px-4 py-3 text-left bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between text-sm"
-    aria-haspopup="true"
-    aria-expanded="false"
-  >
-    <span class="current-selection text-gray-900">{currentOption.label}</span>
-    <svg class="sorter-chevron w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-    </svg>
-  </button>
+<button 
+  type="button" 
+  class="sorter-button w-full px-3 lg:px-4 py-2 lg:py-3 text-left bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between text-xs lg:text-sm rounded-lg"
+  aria-haspopup="true"
+  aria-expanded="false"
+>
+  <span class="current-selection text-gray-900 truncate pr-2">{currentOption.label}</span>
+  <svg class="sorter-chevron w-3 h-3 lg:w-4 lg:h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+  </svg>
+</button>
 
   <!-- Dropdown menu -->
   <div class="sorter-dropdown absolute z-10 w-full mt-1 bg-white border border-gray-300 shadow-lg right-0 hidden">

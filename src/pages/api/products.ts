@@ -21,6 +21,8 @@ export async function GET({ request }: { request: Request }) {
     request.headers.get("forwarded") ||
     "::1";
 
+    console.log(buyerIP)
+    
   // Build query parts
   const queryParts = [];
 

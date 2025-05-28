@@ -2,7 +2,7 @@
 import BaseLayout from "$/layouts/BaseLayout.astro";
 import LimitedTime from "$/components/LimitedTime.astro";
 import { setCache } from "$/utils/cache";
-import { getProducts } from "$/utils/shopify";
+// import { getProducts } from "$/utils/shopify";
 import Filters from "$/components/Filters.astro";
 import Sorter from "$/components/Sorter.astro";
 import ProductsWrapper from "$/components/blocks/products/ProductsWrapper.svelte"
@@ -11,7 +11,6 @@ import Slider from "$/components/Slider.svelte";
 const title = "Catalog";
 const headers = Astro.request.headers;
 const ip = headers.get("x-vercel-forwarded-for") || Astro.clientAddress;
-const products = await getProducts({ buyerIP: ip });
 
 setCache.short(Astro);
 
@@ -32,44 +31,41 @@ const limitedTime = [
 
 <BaseLayout title={title} navigation={{ variant: "relative", enableScrollAnimation: true }}>
   <LimitedTime products={limitedTime} />
-  <div class="section-padding-x grid grid-cols-1 md:grid-cols-12 gap-10 items-baseline">
-    <!-- Sidebar Filters (collapsible on mobile) -->
-    <!-- Mobile Filter Button -->
-    <div class="block lg:hidden mb-4">
-      <button 
-        class="w-full bg-zinc-100 rounded-lg py-2 font-bold text-zinc-900 border border-zinc-200"
-        onclick="document.getElementById('mobileFilter').classList.remove('hidden')"
-      >
-        Filter
-      </button>
-    </div>
-    <!-- Desktop Sidebar -->
-    <aside class="py-4 hidden lg:block lg:col-span-3">
+  <div class="section-padding-x flex flex-col lg:flex-row gap-8">
+    <aside class="hidden lg:block w-80 max-w-xs lg:pr-8">
       <Filters />
     </aside>
-    <!-- Mobile Filter Drawer/Modal -->
-    <div id="mobileFilter" class="fixed inset-0 z-50 bg-black/40 hidden lg:hidden transition-all duration-300">
-      <div class="absolute left-0 top-0 h-full w-4/5 max-w-xs bg-white shadow-lg p-6 overflow-y-auto">
+    <main class="w-full mx-auto">
+      <div class="flex flex-row w-full mx-auto items-center gap-4 mt-6 md:mt-0">
         <button 
-          class="mb-4 text-zinc-900 font-bold"
-          onclick="document.getElementById('mobileFilter').classList.add('hidden')"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-4 rounded-2xl bg-zinc-200 text-black text-2xl font-normal lg:hidden"
+          onclick="document.getElementById('mobileFilter').classList.remove('hidden')"
         >
-          Close
+          Filter
+          <!-- Filter icon SVG (use Heroicons or similar) -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0013 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 017 17v-3.586a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" />
+          </svg>
         </button>
-        <Filters />
-      </div>
-      <!-- Click outside to close -->
-      <div class="absolute inset-0" onclick="document.getElementById('mobileFilter').classList.add('hidden')"></div>
-    </div>
-    <!-- Main Content -->
-    <main class="lg:col-span-9">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div class="w-full sm:w-72 ml-auto">
+        <div class="flex-1">
           <Sorter />
         </div>
       </div>
       <ProductsWrapper client:load buyerIp={ip}/>
       <Slider client:load buyerIp={ip}/>
     </main>
+  </div>
+  <div id="mobileFilter" class="fixed inset-0 z-50 bg-black/40 hidden lg:hidden transition-all duration-300">
+    <div class="absolute left-0 top-0 h-full w-4/5 max-w-xs bg-white shadow-lg p-6 overflow-y-auto">
+      <button 
+        class="mb-4 text-zinc-900 font-bold"
+        onclick="document.getElementById('mobileFilter').classList.add('hidden')"
+      >
+        Close
+      </button>
+      <Filters />
+    </div>
+    <!-- Click outside to close -->
+    <div class="absolute inset-0" onclick="document.getElementById('mobileFilter').classList.add('hidden')"></div>
   </div>
 </BaseLayout>

@@ -22,6 +22,9 @@ export const POST: APIRoute = async ({ request }) => {
     const buyerIP = request.headers.get('x-forwarded-for') || 
                    request.headers.get('x-real-ip') || 
                    '127.0.0.1';
+    console.log('buyerIP:', buyerIP);
+    console.log("RIVIER PASO PASO")
+
 
     // Search products using your existing getProducts function
     const products = await getProducts({
