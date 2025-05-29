@@ -20,9 +20,8 @@ export interface Props {
 const {
   title = "Summer Drop",
   linkText = "Be the first to know",
-  linkUrl = "#",
   buttonText = "SHOP COLLECTION",
-  buttonUrl = "#",
+  buttonUrl = "/collections/all",
   endDate = new Date("2025-05-31T00:00:00Z").toISOString(), // The date we'll finish this site
   products = [],
 } = Astro.props;
@@ -37,15 +36,15 @@ const {
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-secondary font-bold text-black uppercase">
           {title}
         </h1>
-        <a
-          href={linkUrl}
-          class="inline-flex items-center font-secondary font-light text-black hover:underline text-base sm:text-lg"
+        <button
+          
+          class="klaviyo_form_trigger cursor-pointer inline-flex items-center font-secondary font-light text-black hover:underline text-base sm:text-lg"
         >
           {linkText}
           <svg class="ml-2 h-4 w-4 md:h-6 md:w-6 font-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
-        </a>
+        </button>
       </div>
 
       <!-- Center: Countdown -->
@@ -137,6 +136,13 @@ const {
 </div>
 
 <script define:vars={{ endDate }}>
+
+  	document.querySelector('.klaviyo_form_trigger').addEventListener('click', function (){
+		window._klOnsite = window._klOnsite || []; 
+		window._klOnsite.push(['openForm', 'SVr5cA']);
+	});
+
+
   class CountdownTimer {
     constructor(targetDate) {
       this.targetDate = new Date(targetDate);
