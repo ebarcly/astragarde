@@ -101,8 +101,8 @@ const elId = (id: string) => `${instanceId}-${id}`;
             ></div>
             <div
               class="absolute -top-1.5 -right-2 w-5 h-5 bg-gray-800 rounded-full cursor-pointer border-2 border-white shadow focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-150"
-              id={elId("maxHandle")} role="slider" tabindex="0" aria-valuenow="199" aria-valuemin="1" aria-valuemax="199"
-              aria-label="Maximum price" aria-valuetext="$199" style="touch-action: none;"
+              id={elId("maxHandle")} role="slider" tabindex="0" aria-valuenow="249.99" aria-valuemin="1" aria-valuemax="249.99"
+              aria-label="Maximum price" aria-valuetext="$249.99" style="touch-action: none;"
             ></div>
           </div>
         </div>
@@ -169,7 +169,7 @@ const elId = (id: string) => `${instanceId}-${id}`;
       }
 
       this.minPriceConfig = 0;
-      this.maxPriceConfig = 199;
+      this.maxPriceConfig = 249.99;
       this.currentMinPrice = this.minPriceConfig;
       this.currentMaxPrice = this.maxPriceConfig;
       this.isDragging = false;
