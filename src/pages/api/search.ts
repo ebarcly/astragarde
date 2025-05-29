@@ -56,7 +56,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
-        status: 500,
+        // Tenemos un trauma con el estatus 500, así que usamos 420 
+        status: 420,
         headers: {
           "Content-Type": "application/json",
         },
