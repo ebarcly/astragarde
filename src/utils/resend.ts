@@ -12,11 +12,14 @@ export interface ContactFormData {
   message: string;
 }
 
+const emailTo = 'support@astragarde.com'
+const emailFrom = 'Astragarde Support <noreply@astragarde.com>'
+
 export async function sendContactEmail(data: ContactFormData) {
   try {
     const { data: emailData, error } = await resend.emails.send({
-      from: 'Astragarde Support <noreply@astragarde.com>', // Replace with your verified domain
-      to: ['support@astragarde.com'], // Replace with your email
+      from: emailFrom, // Replace with your verified domain
+      to: emailTo, // Replace with your email
       subject: `New Contact Form Submission from ${data.name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
