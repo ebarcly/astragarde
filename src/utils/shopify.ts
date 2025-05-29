@@ -16,7 +16,7 @@ import {
 const makeShopifyRequest = async (
   query: string,
   variables: Record<string, unknown> = {},
-  buyerIP: string = ""
+  buyerIP: string = "",
 ) => {
   const isSSR = import.meta.env.SSR;
   const apiUrl = `https://${config.shopifyShop}/api/${config.apiVersion}/graphql.json`;
@@ -26,7 +26,7 @@ const makeShopifyRequest = async (
     isSSR &&
       !buyerIP &&
       console.error(
-        `🔴 No buyer IP provided => make sure to pass the buyer IP when making a server side Shopify request.`
+        `🔴 No buyer IP provided => make sure to pass the buyer IP when making a server side Shopify request.`,
       );
 
     const { privateShopifyAccessToken, publicShopifyAccessToken } = config;
@@ -51,7 +51,8 @@ const makeShopifyRequest = async (
 
     return options;
   }
-
+  console.log({ options: getOptions() });
+  console.log({ variables, apiUrl });
   const response = await fetch(apiUrl, getOptions());
 
   if (!response.ok) {
@@ -77,13 +78,13 @@ export const getProducts = async (options: {
 
   const data = await makeShopifyRequest(
     ProductsQuery,
-    { 
+    {
       first: limit,
       query,
       sortKey: sortKey || undefined,
-      reverse: reverse || false
+      reverse: reverse || false,
     },
-    buyerIP
+    buyerIP,
   );
   const { products } = data;
 
@@ -108,7 +109,7 @@ export const getProductByHandle = async (options: {
   const data = await makeShopifyRequest(
     ProductByHandleQuery,
     { handle },
-    buyerIP
+    buyerIP,
   );
   const { product } = data;
 
@@ -127,7 +128,7 @@ export const getProductRecommendations = async (options: {
     {
       productId,
     },
-    buyerIP
+    buyerIP,
   );
   const { productRecommendations } = data;
 
@@ -151,7 +152,7 @@ export const createCart = async (id: string, quantity: number) => {
 export const addCartLines = async (
   id: string,
   merchandiseId: string,
-  quantity: number
+  quantity: number,
 ) => {
   const data = await makeShopifyRequest(AddCartLinesMutation, {
     cartId: id,
@@ -179,7 +180,10 @@ export const removeCartLines = async (id: string, lineIds: string[]) => {
   return parsedCart;
 };
 
-export const updateCartLines = async (id: string, lines: { id: string; quantity: number }[]) => {
+export const updateCartLines = async (
+  id: string,
+  lines: { id: string; quantity: number }[],
+) => {
   const data = await makeShopifyRequest(UpdateCartLinesMutation, {
     cartId: id,
     lines,
