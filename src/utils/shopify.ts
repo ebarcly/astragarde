@@ -61,9 +61,7 @@ const makeShopifyRequest = async (
   }
   const json = await response.json();
   if (json.errors) {
-    // We don't throw errors because we are gangsters, but we log them
-    console.error('EL TRAUMITA: ' +json.errors.map((e: Error) => e.message).join("\n"));
-    return { data: [] };
+    throw new Error(json.errors.map((e: Error) => e.message).join("\n"));
   }
   return json.data;
 };
