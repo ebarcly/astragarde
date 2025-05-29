@@ -42,20 +42,61 @@
 </div>
 
 <script>
-  // Add form submission handling
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('contact-form');
     const successMsg = document.getElementById('contact-success');
-    if (form) {
-      form.addEventListener('submit', function (e) {
+    const submitBtn = form?.querySelector('button[type="submit"]');
+    
+    if (form && submitBtn) {
+      form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        // Here you would typically send the data to your backend
-        // Show success message
+        
+        // Disable button and show loading state
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        // Hide any previous success message
         if (successMsg) {
-          successMsg.classList.remove('hidden');
+          successMsg.classList.add('hidden');
         }
-        // Reset form
-        (form as HTMLFormElement).reset();
+        
+        try {
+          // Create FormData from the form
+          const formData = new FormData(form);
+          
+          // Send to API
+          const response = await fetch('/api/email', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Show success message
+            if (successMsg) {
+              successMsg.textContent = result.message;
+              successMsg.classList.remove('hidden');
+            }
+            
+            // Reset form
+            form.reset();
+            
+            // Scroll to success message
+            successMsg?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            // Show error message
+            alert(result.error || 'There was an error sending your message. Please try again.');
+          }
+        } catch (error) {
+          console.error('Form submission error:', error);
+          alert('There was an error sending your message. Please try again.');
+        } finally {
+          // Re-enable button
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        }
       });
     }
   });
