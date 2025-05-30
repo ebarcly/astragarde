@@ -4,7 +4,7 @@ import LogoWhite from "$/components/LogoWhite.astro";
 import CartIcon from "$/components/CartIcon.svelte";
 import SearchIcon from "$/svgs/SearchIcon.astro";
 import Hamburger from "$/svgs/Hamburger.astro";
-import PredictiveSearch from "$/components/PredictiveSearch.svelte"
+// import PredictiveSearch from "$/components/PredictiveSearch.svelte"
 
 export interface Props {
   variant?: "absolute" | "relative";
@@ -65,7 +65,7 @@ const useWhiteIcons = variant === "absolute";
 
     <!-- Logo (responsive size) -->
     <div class="flex justify-center">
-      <a href="/" class="flex items-center max-h-8 sm:max-h-10 lg:max-h-12">
+      <a href="/" class="flex items-center max-h-12 sm:max-h-16 lg:max-h-20">
         {useWhiteIcons ? <LogoWhite /> : <Logo />}
       </a>
     </div>
@@ -97,7 +97,7 @@ const useWhiteIcons = variant === "absolute";
           </button>
         </div>
         <div class="flex justify-center">
-          <a href="/" class="cursor-pointer flex items-center max-h-8 sm:max-h-10 lg:max-h-12">
+          <a href="/" class="cursor-pointer flex items-center max-h-12 sm:max-h-16 lg:max-h-20">
             <Logo />
           </a>
         </div>
